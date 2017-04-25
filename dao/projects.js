@@ -13,7 +13,8 @@ Projects.getAll = function (done) {
         FROM projects AS p
         LEFT OUTER JOIN tag_project_link tpl ON tpl.projectid=p.id
         LEFT OUTER JOIN tags t ON tpl.tagid=t.id
-        GROUP BY p.id`;
+        GROUP BY p.id
+        ORDER BY p.name ASC`;
 
     dbhelper.query(sql, null,
         function (results) {
