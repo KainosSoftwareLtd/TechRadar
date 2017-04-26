@@ -34,6 +34,10 @@
     </div>
 
     <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
+    <div class="col-md-12">
         <div class="alert alert-info">
             Select tags that you would like to attach to <strong><%= project.name %></strong>.
             Uncheck tags to deattach them from the project.
@@ -106,8 +110,8 @@
             title: 'Name',
             formatter: tagNameFormatter,
             sortable: true
-        }],
-    });;
+        }]
+    });
 
     function tagNameFormatter(value, row, index) {
         return [
@@ -131,15 +135,19 @@
             contentType: "application/json",
             url: "/api/project/<%= project.id %>/tags",
             data: JSON.stringify(data)
-        }).done(function( msg ) {
+        }).done(function(msg) {
             if(msg.success) {
                 location.href = "/project/<%= project.id %>/tags";
             } else {
-                alert("Unable to attach tags. \n" + msg.error);
+                TechRadar.viewFlashMessages({"danger":["Unable to attach tags."]});
             }
         }).fail(function() {
-            alert('There was an error attaching tags.');
+            TechRadar.viewFlashMessages({"danger":["There was an error attaching tags."]});
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Project', 'reassign tags', '<%=project.name%>');
+        <% } %>
     });
 
     var initialRun = true;
@@ -154,9 +162,6 @@
         }
     });
 
-    <% if (google_id!=undefined) { %>
-        ga('send', 'event', 'Project', 'reassign tags', '<%=project.name%>');
-    <% } %>
 </script>
 
 </body>

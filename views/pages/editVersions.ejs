@@ -27,6 +27,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div id="custom-toolbar">
@@ -57,9 +61,8 @@
 <script src="/stickyTablePageSize.js"></script>
 <script>
     
-    
     $table = $('#results');
-    $deleteBtn = $('#deleteBtn')
+    $deleteBtn = $('#deleteBtn');
     $editBtn = $('#editBtn');
 
     $table.bootstrapTable( {
@@ -85,11 +88,11 @@
         }, {
             field: 'name',
             title: 'Name',
-            sortable: true,
+            sortable: true
         }, {
             field: 'projects_count',
             title: '# of projects using it',
-            sortable: true,
+            sortable: true
         }]
     });
 
@@ -104,6 +107,7 @@
             return;
         }
 
+        $deleteBtn.prop('disabled', true);
         var data = {};
         data.versions = getIdSelections();
 
@@ -113,14 +117,20 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
-                if (result.success) {
-                    $table.bootstrapTable('refresh' );
-                    $deleteBtn.prop('disabled', true );
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    $table.bootstrapTable('refresh');
                 } else {
-                    alert("There was an error deleting category");
+                    $deleteBtn.prop('disabled', false);
                 }
+
+                TechRadar.viewFlashMessages(response.messages);
             }
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Technology', 'delete versions', '<%=technology.name%>');
+        <% } %>
     });
 
     $editBtn.click(function () {
@@ -140,26 +150,30 @@
             contentType: "application/json",
             url: "/api/versions",
             data: JSON.stringify(data)
-        }).done(function( msg ) {
+        }).done(function(msg) {
             if(msg.success) {
                 location.reload();
             } else {
-                alert("Unable to update this version. Perhaps the same version already exists.");
+                TechRadar.viewFlashMessages({"danger":["Unable to update this version. Perhaps the same version already exists."]});
             }
         }).fail(function() {
-            alert('There was an error updating version.');
+            TechRadar.viewFlashMessages({"danger":["There was an error updating version."]});
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Technology', 'edit versions', '<%=technology.name%>');
+        <% } %>
     });
 
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.id
+            return row.id;
         });
     }
 
     function getNameSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.name
+            return row.name;
         });
     }
 
@@ -170,10 +184,6 @@
     $('#myModal').on('hidden.bs.modal', function () {
         $table.bootstrapTable('refresh');
     });
-
-    <% if (google_id!=undefined) { %>
-        ga('send', 'event', 'Technology', 'edit versions', '<%=technology.name%>');
-    <% } %>
 
 </script>
 

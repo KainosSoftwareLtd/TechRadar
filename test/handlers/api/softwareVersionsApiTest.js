@@ -12,12 +12,13 @@ describe("Software versions api handler", function() {
     beforeEach(function() {
         req = res = {};
         res.end = sinon.spy();
+        res.flash = sinon.spy();
         res.writeHead = sinon.spy();
-        apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet');
+        apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash');
     });
 
     afterEach(function() {
-        apiutils.handleResultSet.restore();
+        apiutils.handleResultWithFlash.restore();
     });
 
     describe("getAllVersionsForTechnology", function() {
@@ -90,8 +91,8 @@ describe("Software versions api handler", function() {
         it("should generate a response based on dao results", function() {
             apiVersions.addVersion(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData.technology);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData.technology);
         });
     });
 
@@ -104,15 +105,20 @@ describe("Software versions api handler", function() {
                 version: testData.version,
                 name: testData.name
             };
-            req.checkBody = function () {}; // this method normally comes from express middleware
-            req.validationErrors = function () {}; // this method normally comes from express middleware
+
+            // this methods normally comes from express middleware
+            req.checkBody = function () {};
+            req.validationErrors = function () {
+                return null;
+            };
+
             updateVersionSpy = sinon.stub(versionsDao, 'update', function (version, name, cb) {
                 cb(testData.version, testData.name);
             });
             var methods = { 
                 isInt: sinon.stub(),
                 notEmpty: sinon.stub() 
-            }
+            };
             sinon.stub(req, 'checkBody').returns(methods);
         });
 
@@ -137,7 +143,7 @@ describe("Software versions api handler", function() {
         });
 
         it("should not update when validation fails", function() {
-            sinon.stub(req, 'validationErrors').returns(true);
+            sinon.stub(req, 'validationErrors').returns(["error"]);
 
             apiVersions.updateVersion(req, res);
 
@@ -149,8 +155,8 @@ describe("Software versions api handler", function() {
         it("should generate a response based on dao results", function() {
             apiVersions.updateVersion(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData.version);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData.version);
         });
     });
 
@@ -181,8 +187,8 @@ describe("Software versions api handler", function() {
         it("should generate a response based on dao results", function() {
             apiVersions.deleteVersions(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData.versions);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData.versions);
         });
     });
 });

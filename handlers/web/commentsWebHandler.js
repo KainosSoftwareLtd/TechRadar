@@ -11,6 +11,9 @@ CommentsWebHandler.add = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -26,6 +29,9 @@ CommentsWebHandler.update = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -43,14 +49,27 @@ CommentsWebHandler.commentsForTechnology = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
 
     var techid = req.params.technologyId;
     var pageNumber = req.params.page;
-    comments.getForTechnology(techid, pageNumber, PAGE_SIZE, function (result,error) {
-        comments.getCountForTechnology(techid, function (countData) {
+    comments.getForTechnology(techid, pageNumber, PAGE_SIZE, function (result, error) {
+        if(error) {
+            res.redirect('/error');
+            return;
+        }
+
+        comments.getCountForTechnology(techid, function (countData, countError) {
+            if(countError) {
+                res.redirect('/error');
+                return;
+            }
+
             res.render('partials/comments', {
                 comments: result,
                 user: req.user,

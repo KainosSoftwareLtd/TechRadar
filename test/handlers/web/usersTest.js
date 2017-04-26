@@ -10,6 +10,7 @@ describe("Users web handler", function() {
     beforeEach(function() {
         req = res = {};
         res.render = sinon.spy();
+        req.flash = sinon.spy();
     });
 
     describe("listUsers", function() {

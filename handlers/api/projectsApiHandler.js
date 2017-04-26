@@ -22,7 +22,7 @@ ProjectsApiHandler.getProjectsForTag = function (req, res) {
     var tagId = sanitizer(req.params.tagId);
 
     projects.getAllForTag(tagId, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     });
 };
 
@@ -33,11 +33,7 @@ ProjectsApiHandler.addProject = function (req, res) {
 
     var validationResult = projectValidator.validateProjectName(projectName);
     if (!validationResult.valid) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        var data = {};
-        data.error = validationResult.message;
-        data.success = false;
-        res.end(JSON.stringify(data));
+        apiutils.handleResultWithFlash(req, res, null, validationResult.message);
         return;
     }
 
@@ -46,9 +42,8 @@ ProjectsApiHandler.addProject = function (req, res) {
         projectDescription,
 
         function (result, error) {
-            apiutils.handleResultSet(res, result, error);
+            apiutils.handleResultWithFlash(req, res, result, error);
         });
-
 };
 
 
@@ -56,15 +51,15 @@ ProjectsApiHandler.deleteProject = function (req, res) {
     var data = req.body.id;
 
     projects.delete(data, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    })
+        apiutils.handleResultWithFlash(req, res, result, error);
+    });
 };
 
 ProjectsApiHandler.deleteTechnologiesFromProject = function (req, res) {
     var linkIds = req.body.links;
 
     projects.deleteTechnologies(linkIds, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     });
 };
 
@@ -77,12 +72,15 @@ ProjectsApiHandler.updateTechnologyVersion = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
-        res.end(JSON.stringify({success: false, error: errors}));
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
+        apiutils.handleResultWithFlash(req, res, null, errors, false, true);
         return;
     }
 
     projects.updateTechnologyVersion(versionId, linkId, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     });
 };
 
@@ -102,7 +100,7 @@ ProjectsApiHandler.addTechnologyToProject = function (req, res) {
     var versionIds = req.body.versions;
 
     projects.addTechnologies(projectId, technologyIds, versionIds, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     });
 };
 
@@ -112,7 +110,7 @@ ProjectsApiHandler.updateProject = function (req, res) {
         req.body.projectId,
         sanitizer(req.body.projectname.trim()),
         sanitizer(req.body.description), function (result, error) {
-            apiutils.handleResultSet(res, result, error);
+            apiutils.handleResultWithFlash(req, res, result, error);
         });
 
 };

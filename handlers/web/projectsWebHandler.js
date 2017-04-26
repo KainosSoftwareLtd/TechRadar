@@ -15,6 +15,9 @@ ProjectsWebHandler.reassignTags = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -26,10 +29,16 @@ ProjectsWebHandler.reassignTags = function (req, res) {
         }
         tags.getAllWithOptionalProjectId(req.params.projectId, function (tags, tagsError) {
             if (tagsError) {
+                req.flash("danger", "Error while retrieving project tags for project id: " + req.params.projectId);
                 res.redirect('/error');
                 return;
             } else {
-                res.render('pages/reassignTags', {user: req.user, tags: tags, project: project});
+                res.render('pages/reassignTags', {
+                    user: req.user,
+                    tags: tags,
+                    project: project,
+                    messages: req.flash()
+                });
             }
         });
     });
@@ -37,13 +46,20 @@ ProjectsWebHandler.reassignTags = function (req, res) {
 
 ProjectsWebHandler.editTags = function (req, res) {
     tags.getAll(function (tags) {
-        res.render('pages/editTags', {user: req.user, tags: tags});
+        res.render('pages/editTags', {
+            user: req.user,
+            tags: tags,
+            messages: req.flash()
+        });
     });
 };
 
 ProjectsWebHandler.edit = function (req, res) {
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -63,6 +79,9 @@ ProjectsWebHandler.addTechnology = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -81,6 +100,9 @@ ProjectsWebHandler.removeTechnology = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -99,6 +121,9 @@ ProjectsWebHandler.showRadar = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -147,12 +172,12 @@ ProjectsWebHandler.list = function (req, res) {
     // check if a project name parameter has been specified
     var name = req.query.name;
 
-    if( name==undefined) {
+    if(name == undefined) {
         res.render('pages/searchProjects', {user: req.user});
     } else {
         name = decodeURI(name);
 
-        projects.findByName( name , function( error , project ) {
+        projects.findByName(name , function(error, project) {
             if (error) {
                 res.redirect('/error');
             } else {

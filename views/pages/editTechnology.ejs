@@ -29,6 +29,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <div class="col-md-10 col-md-offset-1" style="padding-top: 10px;">
         <form action="javascript:void(0);" method="POST">
             <input type="hidden" name="id" value="<%= technology.id %>">
@@ -52,13 +56,12 @@
 
                     <%
                     categories.forEach(function(category, index, arr) {
-
-                    if (technology.category == category.id) { %>
-                    <option value="<%= category.id %>" selected="selected"><%= category.name %></option>
-                    <% } else { %>
-                    <option value="<%= category.id %>"><%= category.name %></option>
-                    <% }
-                    });
+                        if (technology.category == category.id) { %>
+                            <option value="<%= category.id %>" selected="selected"><%= category.name %></option>
+                        <% } else { %>
+                            <option value="<%= category.id %>"><%= category.name %></option>
+                        <% }
+                        });
                     %>
 
                 </select>
@@ -107,7 +110,7 @@
         validationResult = validationResult.valid ? TechnologyValidator.validateTechnologyWebsite(technologyWebsite) : validationResult;
         validationResult = validationResult.valid ? TechnologyValidator.validateTechnologyLicenceWebsite(technologyLicenceLink) : validationResult;
         if (!validationResult.valid) {
-            alert(validationResult.message);
+            TechRadar.viewFlashMessages({"danger":[validationResult.message]});
             return;
         }
 
@@ -123,16 +126,18 @@
             data: JSON.stringify(data),
             success: function (result) {
                 if (result.success) {
+                    sessionStorage.setItem("messages", JSON.stringify(result.messages));
                     location.href = "/technology/<%= technology.id %>";
                 } else {
-                    alert("There was an error updating the Technology :)");
+                    TechRadar.viewFlashMessages({"danger":["There was an error updating the Technology"]});
                 }
+
                 $(":submit").attr("disabled", false);
             }
         });
 
-        <% if (google_id!=undefined) { %>
-        ga('send', 'event', 'Technology', 'edit', '<%=technology.name%>');
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Technology', 'edit', '<%=technology.name%>');
         <% } %>
     });
 

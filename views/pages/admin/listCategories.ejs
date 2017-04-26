@@ -39,6 +39,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div id="custom-toolbar">
@@ -67,7 +71,7 @@
 
 
     $table = $('#results');
-    $deleteBtn = $('#deleteBtn')
+    $deleteBtn = $('#deleteBtn');
 
     $table.bootstrapTable( {
         method: 'get',
@@ -92,7 +96,7 @@
         }, {
             field: 'name',
             title: 'Name',
-            sortable: true,
+            sortable: true
         }, {
             field: 'description',
             title: 'Description',
@@ -120,20 +124,22 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
-                if (result.success) {
-                    $table.bootstrapTable('refresh' );
-                    $deleteBtn.prop('disabled', true );
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    $table.bootstrapTable('refresh');
+                    $deleteBtn.prop('disabled', true);
+                    TechRadar.viewFlashMessages(response.messages);
                 } else {
-                    alert("There was an error deleting category");
+                    TechRadar.viewFlashMessages({danger:["There was an error deleting category"]});
                 }
             }
         });
-    });;
+    });
 
 
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.id
+            return row.id;
         });
     }
 

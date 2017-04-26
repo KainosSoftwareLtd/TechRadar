@@ -38,6 +38,9 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
 
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
@@ -77,6 +80,10 @@ $(function () { // when the DOM is ready
     $table = $('#results');
 
     TechRadar.getAllTags(function(allTags, error) {
+        if (error) {
+            TechRadar.viewFlashMessages({"warning": [error.message]});
+        }
+
         $table.bootstrapTable({
             method: 'get',
             url: '/api/projects/tag/<%= tag.id %>',
@@ -140,6 +147,7 @@ $(function () { // when the DOM is ready
             return;
         }
 
+        $deleteBtn.prop('disabled', true);
         var data = {};
         data.id = getIdSelections();
 
@@ -149,17 +157,19 @@ $(function () { // when the DOM is ready
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function (result) {
-                if (result.success) {
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
                     $table.bootstrapTable('refresh');
-                    $deleteBtn.prop('disabled', true);
                 } else {
-                    alert("There was an error deleting technology :(");
+                    $deleteBtn.prop('disabled', false);
                 }
+
+                TechRadar.viewFlashMessages(response.messages);
             }
         });
 
-        <% if (google_id!=undefined) { %>
-        ga('send', 'event', 'Project', 'delete', data.id);
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Project', 'delete', data.id);
         <% } %>
     });
 

@@ -14,7 +14,7 @@ $(function() {
                     done(result.result); // get the nested results
                 } else {
                     console.log('Error getting tags.');
-                    done(null, new Error('Error getting tags'));
+                    done(null, new Error('Error getting all tags'));
                 }
             }
         });

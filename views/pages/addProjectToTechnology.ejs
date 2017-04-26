@@ -34,6 +34,11 @@ getBreadcrumb = function() {
             <li class="active">Change usage in projects</li>
         </ol>
     </div>
+
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <row>
         <div class="col-md-12" style="margin-top: 10px">
             <row>
@@ -140,14 +145,20 @@ getBreadcrumb = function() {
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
-                if (result.success) {
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    sessionStorage.setItem("messages", JSON.stringify({"success":["Link removed"]}));
                     location.href = "/technology/<%=technology.id%>/projects";
                 } else {
-                    alert("There was an error deleting project links");
+                    TechRadar.viewFlashMessages({"danger":["There was an error deleting project links"]});
                 }
                 $deleteBtn.removeClass("disabled");
             }
         });
+
+        <% if (google_id!=undefined) { %>
+        ga('send', 'event', 'Technology', 'remove project link',  '<%=technology.name%> - ' + $('#newProject option:selected').text() );
+        <% } %>
     });
 
     var addProject = function () {
@@ -161,16 +172,17 @@ getBreadcrumb = function() {
 
         $.post('/api/technology/<%= technology.id %>/project', data, function (result) {
             if(result.success) {
+                sessionStorage.setItem("messages", JSON.stringify({"success":["Link added successfully"]}));
                 location.href = "/technology/<%=technology.id%>/projects";
             } else {
-                alert("An error occurred while adding a project");
+                TechRadar.viewFlashMessages({"danger":["An error occurred while adding a project"]});
             }
 
             $(":submit").attr("disabled", false);
         });
 
-        <% if (google_id!=undefined) { %>
-        ga('send', 'event', 'Technology', 'add project',  '<%=technology.name%> - ' + $('#newProject option:selected').text() );
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Technology', 'add project',  '<%=technology.name%> - ' + $('#newProject option:selected').text() );
         <% } %>
     };
 

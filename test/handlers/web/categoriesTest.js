@@ -15,6 +15,7 @@ describe("Categories web handler", function() {
     beforeEach(function() {
         req = res = {};
         res.render = sinon.spy();
+        req.flash = sinon.spy();
         res.redirect = sinon.spy();
     });
 

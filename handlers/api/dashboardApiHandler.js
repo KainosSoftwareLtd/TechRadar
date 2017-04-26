@@ -26,7 +26,7 @@ DashboardApiHandler.getVotesForAllTechnologies = function (req, res) {
         res.writeHead(200, {"Content-Type": "application/json"});
         res.end(JSON.stringify(result));
     })
-}
+};
 
 DashboardApiHandler.getVotesDifferentFromStatus = function (req, res) {
     votes.getVotesInLastMonthDifferentFromStatus(function (result) {

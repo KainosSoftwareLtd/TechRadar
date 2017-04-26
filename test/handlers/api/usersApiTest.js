@@ -11,12 +11,14 @@ var crypto = require('crypto');
 
 
 describe("Users api handler", function() {
-    var req, res;
+    var req, res,
+        errorMsg = 'mock error';
 
     beforeEach(function() {
         req = res = {};
         res.end = sinon.spy();
         res.writeHead = sinon.spy();
+        req.flash = sinon.spy();
     });
 
     describe("addUser", function() {
@@ -41,10 +43,10 @@ describe("Users api handler", function() {
             addUserSpy = sinon.stub(users, 'add', function (user, cb) {
                 cb(testData);
             });
-            apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet', function(res, result, error) {
+            apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash', function(req, res, result, error) {
             });
             validateNewPasswordSpy = sinon.stub(userValidator, 'validateNewPassword', function(password, password2) {
-                return {valid: password === password2};
+                return {valid: password === password2, message: password === password2 ? null : errorMsg};
             });
             validateUsernameSpy = sinon.stub(userValidator, 'validateUsername', function(username) {
                 return {valid: true};
@@ -57,7 +59,7 @@ describe("Users api handler", function() {
 
         afterEach(function() {
             users.add.restore();
-            apiutils.handleResultSet.restore();
+            apiutils.handleResultWithFlash.restore();
             userValidator.validateNewPassword.restore();
             userValidator.validateUsername.restore();
             userValidator.validateEmail.restore();
@@ -78,8 +80,8 @@ describe("Users api handler", function() {
         it("should generate response based on dao results", function() {
             apiUsers.addUser(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).that.is.a('number').to.equal(testData);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('number').to.equal(testData);
         });
 
         it("should validate user data", function() {
@@ -98,8 +100,8 @@ describe("Users api handler", function() {
             req.body.password2 = "fail_plz";
             apiUsers.addUser(req, res);
 
-            sinon.assert.calledOnce(res.end);
-            expect(res.end.getCalls()[0].args[0]).that.is.a('string').to.equal(JSON.stringify({success: false}));
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
 
         describe("signUp", function() {
@@ -124,7 +126,6 @@ describe("Users api handler", function() {
         var updateUserSpy,
             findByIdUserSpy,
             existingUserId = 12,
-            errorMsg = 'mock error',
             userFromDbMock,
             apiUtilsSpy,
             validateNewPasswordChangeSpy,
@@ -165,7 +166,7 @@ describe("Users api handler", function() {
                 }
 
             });
-            apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet', function(res, result, error) {
+            apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash', function(req, res, result, error) {
             });
             validateNewPasswordChangeSpy = sinon.stub(userValidator, 'validateNewPasswordChange', function(password, password2, oldPassword) {
                 return {valid: password === password2, message: password === password2 ? null : errorMsg };
@@ -182,7 +183,7 @@ describe("Users api handler", function() {
         afterEach(function() {
             users.update.restore();
             users.findById.restore();
-            apiutils.handleResultSet.restore();
+            apiutils.handleResultWithFlash.restore();
             userValidator.validateNewPasswordChange.restore();
             userValidator.validateAvatar.restore();
             userValidator.validateEmail.restore();
@@ -212,24 +213,24 @@ describe("Users api handler", function() {
             req.body.confirmPassword = "fail_plz";
             apiUsers.updateProfile(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(errorMsg);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
 
         it("should respond with error when user not found", function() {
             req.user.id = "fail_plz";
             apiUsers.updateProfile(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(errorMsg);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
 
         it("should respond with error when passwords do not match", function() {
             req.body.oldPassword = "fail_plz";
             apiUsers.updateProfile(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal("Old password is incorrect");
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal("Old password is incorrect");
         });
 
         it("should not validate avatar when no avatar selected", function() {
@@ -243,8 +244,8 @@ describe("Users api handler", function() {
             req.password = req.confirmPassword = req.oldPassword = '';
             apiUsers.updateProfile(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).is.undefined;
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).is.undefined;
         });
 
         it("should update user with appropriate data", function() {
@@ -280,8 +281,8 @@ describe("Users api handler", function() {
             apiUsers.updateProfile(req, res);
 
             sinon.assert.calledOnce(users.update);
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).that.is.a('number').to.equal(req.user.id);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('number').to.equal(req.user.id);
         });
     });
 
@@ -289,7 +290,6 @@ describe("Users api handler", function() {
         var updateUserSpy,
             findByIdUserSpy,
             existingUserId = '12',
-            errorMsg = 'mock error',
             userFromDbMock,
             apiUtilsSpy,
             validateNewPasswordSpy,
@@ -329,10 +329,10 @@ describe("Users api handler", function() {
                 }
 
             });
-            apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet', function(res, result, error) {
+            apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash', function(req, res, result, error) {
             });
             validateNewPasswordSpy = sinon.stub(userValidator, 'validateNewPassword', function(password, password2) {
-                return {valid: password === password2, message: password === password2 ? null : errorMsg };
+                return {valid: password === password2, message: password === password2 ? null : errorMsg};
             });
             validateAvatarSpy = sinon.stub(userValidator, 'validateAvatar', function(file) {
                 return {valid: !!file};
@@ -346,7 +346,7 @@ describe("Users api handler", function() {
         afterEach(function() {
             users.update.restore();
             users.findById.restore();
-            apiutils.handleResultSet.restore();
+            apiutils.handleResultWithFlash.restore();
             userValidator.validateNewPassword.restore();
             userValidator.validateAvatar.restore();
             userValidator.validateEmail.restore();
@@ -375,24 +375,24 @@ describe("Users api handler", function() {
             req.body.confirmPassword = "fail_plz";
             apiUsers.updateUser(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(errorMsg);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
 
         it("should respond with error when user not found", function() {
             req.params.userId = "fail_plz";
             apiUsers.updateUser(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(errorMsg);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
 
         it("should respond with error when passwords do not match", function() {
             req.body.confirmPassword = "fail_plz";
             apiUsers.updateUser(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(errorMsg);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
 
         it("should not validate avatar when no avatar selected", function() {
@@ -419,23 +419,26 @@ describe("Users api handler", function() {
             apiUsers.updateUser(req, res);
 
             sinon.assert.calledOnce(users.update);
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).that.is.a('string').to.equal(req.params.userId);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(req.params.userId);
         });
     });
 
     describe("getAllUsers", function() {
-        var getAllSpy,
+        var getAllSpy, apiUtilsSpy,
             testData = '12';
 
         beforeEach(function() {
             getAllSpy = sinon.stub(users, 'getAll', function (cb) {
-                cb(testData);
+                cb(req.error, testData);
+            });
+            apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash', function(req, res, result, error) {
             });
         });
 
         afterEach(function() {
             users.getAll.restore();
+            apiutils.handleResultWithFlash.restore();
         });
 
         it("should call user dao to retrieve users", function() {
@@ -447,8 +450,17 @@ describe("Users api handler", function() {
         it("should generate response based on dao results", function() {
             apiUsers.getAllUsers(req, res);
 
-            sinon.assert.calledOnce(res.end);
-            expect(res.end.getCalls()[0].args[0]).that.is.a('string').to.equal(JSON.stringify(testData));
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(testData);
+        });
+
+        it("should pass the error to the handler", function() {
+            req.error = errorMsg;
+            apiUsers.getAllUsers(req, res);
+
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
+            req.error = null;
         });
     });
 
@@ -463,13 +475,13 @@ describe("Users api handler", function() {
             deleteSpy = sinon.stub(users, 'delete', function (ids, cb) {
                 cb(testData);
             });
-            apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet', function(res, result, error) {
+            apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash', function(req, res, result, error) {
             });
         });
 
         afterEach(function() {
             users.delete.restore();
-            apiutils.handleResultSet.restore();
+            apiutils.handleResultWithFlash.restore();
         });
 
         it("should call user dao to delete users", function() {
@@ -482,15 +494,14 @@ describe("Users api handler", function() {
         it("should generate response based on dao results", function() {
             apiUsers.deleteUsers(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[1]).that.is.a('string').to.equal(testData);
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal(testData);
         });
     });
 
     describe("getAvatar", function() {
         var getAvatarSpy,
             apiUtilsSpy,
-            errorMsg = 'mock error',
             validUsername = "valid_uname",
             testData = '12';
 
@@ -504,21 +515,21 @@ describe("Users api handler", function() {
                     cb(null, errorMsg);
                 }
             });
-            apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet', function(res, result, error) {
+            apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash', function(req, res, result, error) {
             });
         });
 
         afterEach(function() {
             users.getAvatar.restore();
-            apiutils.handleResultSet.restore();
+            apiutils.handleResultWithFlash.restore();
         });
 
         it("should check whether username is supplied", function() {
             req.query.username = '';
             apiUsers.getAvatar(req, res);
 
-            sinon.assert.calledOnce(apiutils.handleResultSet);
-            expect(apiUtilsSpy.getCalls()[0].args[2]).that.is.a('string').to.equal("Username parameter missing");
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal("Username parameter missing");
         });
 
         it("should call getAvatar dao to retrieve the image", function() {
@@ -539,8 +550,8 @@ describe("Users api handler", function() {
             req.query.username = "invalid_uname";
             apiUsers.getAvatar(req, res);
 
-            sinon.assert.calledOnce(res.end);
-            expect(JSON.parse(res.end.getCalls()[0].args[0])).that.is.a('object').to.eql({success: false, error: errorMsg});
+            sinon.assert.calledOnce(apiutils.handleResultWithFlash);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).that.is.a('string').to.equal(errorMsg);
         });
     });
 });

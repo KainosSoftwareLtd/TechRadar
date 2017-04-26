@@ -18,7 +18,7 @@
 <%
     getBreadcrumb = function() {
         return technology.categoryname.toLowerCase();
-    }
+    };
 %>
 
 <% include ../partials/menu.ejs %>
@@ -33,6 +33,10 @@
             <li><a href="/technology/<%=technology.id%>"><%=technology.name%></a></li>
             <li class="active">Vote History</li>
         </ol>
+    </div>
+
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
     </div>
 
     <row>

@@ -38,6 +38,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div id="custom-toolbar">
@@ -66,9 +70,8 @@
 <script src="/stickyTablePageSize.js"></script>
 <script>
 
-    
     $table = $('#results');
-    $deleteBtn = $('#deleteBtn')
+    $deleteBtn = $('#deleteBtn');
 
     $table.bootstrapTable( {
         method: 'get',
@@ -93,11 +96,11 @@
         }, {
             field: 'name',
             title: 'Name',
-            sortable: true,
+            sortable: true
         }, {
             field: 'description',
             title: 'Description',
-            sortable: false,
+            sortable: false
         }
         ]
     });
@@ -114,7 +117,7 @@
             return;
         }
 
-        var data={};
+        var data = {};
         data.id = getIdSelections();
 
         $.ajax({
@@ -123,21 +126,26 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
-                if (result.success) {
-                    $table.bootstrapTable('refresh' );
-                    $deleteBtn.prop('disabled', true );
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    TechRadar.viewFlashMessages(response.messages);
+                    $table.bootstrapTable('refresh');
+                    $deleteBtn.prop('disabled', true);
                 } else {
-                    alert("There was an error deleting stack :(");
+                    TechRadar.viewFlashMessages({"danger":["There was an error deleting stack :("]});
                 }
             }
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Stack', 'delete', data.id.join());
+        <% } %>
     });
     <% } %>
 
-
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.id
+            return row.id;
         });
     }
 

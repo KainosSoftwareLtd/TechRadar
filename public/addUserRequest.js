@@ -26,11 +26,11 @@ $( "form" ).submit(function(event) {
         contentType: "application/json",
         data: JSON.stringify(frmdata),
         success: function(result) {
-            if( result.success) {
+            if(result.success) {
+                sessionStorage.setItem("messages", JSON.stringify({"success":["User added successfully"]}));
                 location.href = redirectSuccessUrl;
             } else {
-                alert(`The registration process is not working. 
-                    Please contact the administrator.`);
+                TechRadar.viewFlashMessages(result.messages);
             }
             $(":submit").attr("disabled", false);
         }

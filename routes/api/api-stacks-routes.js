@@ -42,11 +42,10 @@ ApiStackRoutes.createRoutes = function (self) {
         function (req, res) {
 
             stacks.add(
-                sanitizer( req.body.name.trim() ),
-                sanitizer( req.body.description ),
-
-                function ( result , error ) {
-                    apiutils.handleResultSet( res, result , error );
+                sanitizer(req.body.name.trim()),
+                sanitizer(req.body.description),
+                function (result, error) {
+                    apiutils.handleResultWithFlash(req, res, result, error);
                 });
         });
 
@@ -55,14 +54,13 @@ ApiStackRoutes.createRoutes = function (self) {
      */
     self.app.delete('/api/stack', security.isAuthenticatedAdmin, jsonParser,
         function (req, res) {
-            var data = req.body.id ;
+            var data = req.body.id;
 
-            stacks.delete( data , function( result , error ) {
-                apiutils.handleResultSet( res, result , error );
-            })
+            stacks.delete(data, function(result, error) {
+                apiutils.handleResultWithFlash(req, res, result, error);
+            });
         });
-
-}
+};
 
 
 module.exports = ApiStackRoutes;

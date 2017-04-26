@@ -29,10 +29,14 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-bottom: 5px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/category/<%=getBreadcrumb() %>/technologies"><%=technology.categoryname%></a></li>
-            <li><a href="/technology/<%=technology.id%>"><%=technology.name%></a></li>
+            <li><a href="/category/<%= getBreadcrumb() %>/technologies"><%= technology.categoryname %></a></li>
+            <li><a href="/technology/<%= technology.id %>"><%= technology.name %></a></li>
             <li class="active">Status History</li>
         </ol>
+    </div>
+
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
     </div>
 
     <row>
@@ -51,10 +55,9 @@
 <script src="/stickyTablePageSize.js"></script>
 <script>
 
-    
     $('#results').bootstrapTable( {
         method: 'get',
-        url: '/api/technology/<%=technology.id%>/status/history',
+        url: '/api/technology/<%= technology.id %>/status/history',
         cache: false,
         striped: true,
         escape: true,
@@ -73,7 +76,7 @@
             field: 'name',
             title: 'Name',
             align: 'center',
-            sortable: true,
+            sortable: true
         }, {
             field: 'username',
             title: 'Username',
@@ -86,7 +89,7 @@
             sortable: true
         }, {
             field: 'reason',
-            title: 'Reason',
+            title: 'Reason'
         }]
     });
 
@@ -97,7 +100,12 @@
     var statusBtn = function () {
         var data = {statusvalue: $('#statusPulldown').val(), reason: $('#reasonTextArea').val(), technology:<%= technology.id %>};
         $.post('/api/technology/<%= technology.id %>/status', data, function (result) {
-            location.reload()
+            if(result.success) {
+                sessionStorage.setItem("messages", JSON.stringify(response.messages));
+                location.reload();
+            } else {
+                TechRadar.viewFlashMessages(result.messages);
+            }
         });
     };
 
@@ -106,7 +114,6 @@
             $(this).val(this.getAttribute("value"));
         });
     });
-
 
 
     $('#statusBtn').click(statusBtn);

@@ -25,6 +25,10 @@
                 <h1>Stack Builder</h1>
                 <p>Coming soon</p>
             </div>
+
+            <div class="col-md-12">
+                <% include ../partials/flash-messages.ejs %>
+            </div>
         </row>
 
     </div>
@@ -79,12 +83,12 @@
             align: 'center',
             sortable: true
         }]
-    })
+    });
 
 
     window.operateEvents = {
         'click .like': function (e, value, row, index) {
-            alert('You click like action, row: ' + JSON.stringify(row));
+            TechRadar.viewFlashMessages({"info":['You click like action, row: ' + JSON.stringify(row)]});
         },
         'click .remove': function (e, value, row, index) {
             $table.bootstrapTable('remove', {

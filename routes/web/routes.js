@@ -37,9 +37,9 @@ Routes.createRoutes = function (self) {
     self.app.get('/error',
         function (req, res) {
             if (req.isAuthenticated()) {
-                res.render('pages/errorLoggedIn', {user: req.user});
+                res.render('pages/errorLoggedIn', {user: req.user, messages: req.flash()});
             } else {
-                res.render('pages/error');
+                res.render('pages/error', {messages: req.flash()});
             }
         });
 

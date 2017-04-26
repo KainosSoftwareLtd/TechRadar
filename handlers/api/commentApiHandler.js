@@ -15,7 +15,7 @@ CommentApiHandler.addComment = function (req, res) {
         sanitizer(req.body.software_version_id),
 
         function (result, error) {
-            apiutils.handleResultSet(res, result, error);
+            apiutils.handleResultWithFlash(req, res, result, error);
         });
 };
 
@@ -24,14 +24,14 @@ CommentApiHandler.updateComment = function (req, res) {
         // if not the owner of this comment and not an admin
         if (comment.userid !== req.user.id && req.user.role !== 0) {
             var error = "Only admins can edit comments created by other users";
-            apiutils.handleResultSet(res, false, error);
+            apiutils.handleResultWithFlash(req, res, false, error);
         } else {
             comments.update(
                 sanitizer(req.body.commentId),
                 sanitizer(req.body.comment),
                 sanitizer(req.body.software_version_id),
                 function(result, error) {
-                    apiutils.handleResultSet(res, result, error);
+                    apiutils.handleResultWithFlash(req, res, result, error);
             });
         }
     });
@@ -41,7 +41,7 @@ CommentApiHandler.deleteComment = function (req, res) {
     var data = req.body.id;
 
     comments.delete(data, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     })
 };
 

@@ -28,9 +28,14 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li class="active">Edit profile</li>
+            <li class="active">Edit user</li>
         </ol>
     </div>
+
+    <div class="col-md-12">
+        <% include ../../../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <form action="javascript:void(0);" method="POST">
@@ -137,8 +142,8 @@
             }
 
             if (!validationResult.valid) {
-                alert(validationResult.message);
                 $(":submit").attr("disabled", false);
+                TechRadar.viewFlashMessages({"danger":[validationResult.message]});
                 return;
             }
 
@@ -151,10 +156,11 @@
                 data: data,
                 success: function (result) {
                     if (result.success) {
+                        sessionStorage.setItem("messages", JSON.stringify({"success":["User updated successfully"]}));
                         location.href = "/users";
                     } else {
                         console.log(result.error);
-                        alert("There was an error while saving new user data");
+                        TechRadar.viewFlashMessages({"danger":["There was an error while saving new user data"]});
                     }
                     $(":submit").attr("disabled", false);
                 }

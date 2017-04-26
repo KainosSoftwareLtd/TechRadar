@@ -17,11 +17,11 @@ Users.getAll = function(done) {
 
     dbhelper.query(sql, [],
         function (results) {
-            done( results);
+            done(null, results);
         },
         function (error) {
             console.log(error);
-            return done( null );
+            return done(error, null);
         });
 };
 

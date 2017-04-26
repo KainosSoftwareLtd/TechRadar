@@ -25,6 +25,9 @@ TechnologiesWebHandler.edit = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -41,7 +44,8 @@ TechnologiesWebHandler.edit = function (req, res) {
                 {
                     technology: value,
                     user: req.user,
-                    statuses: statuses
+                    statuses: statuses,
+                    messages: req.flash()
                 });
         }
     });
@@ -52,6 +56,9 @@ TechnologiesWebHandler.getVersions = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -66,7 +73,8 @@ TechnologiesWebHandler.getVersions = function (req, res) {
             res.render('pages/editVersions',
                 {
                     technology: value,
-                    user: req.user
+                    user: req.user,
+                    messages: req.flash()
                 });
         }
     });
@@ -77,6 +85,9 @@ TechnologiesWebHandler.getTechnology = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -95,7 +106,8 @@ TechnologiesWebHandler.getTechnology = function (req, res) {
                     technology: value,
                     user: req.user,
                     statuses: statuses,
-                    usedThisOptions: usedThisOptions
+                    usedThisOptions: usedThisOptions,
+                    messages: req.flash()
                 });
         }
     });
@@ -106,6 +118,9 @@ TechnologiesWebHandler.getUsers = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -122,7 +137,8 @@ TechnologiesWebHandler.getUsers = function (req, res) {
                     {
                         technology: value,
                         user: req.user,
-                        techUsers: users
+                        techUsers: users,
+                        messages: req.flash()
                     });
             }
         });
@@ -134,6 +150,9 @@ TechnologiesWebHandler.getStatusHistory = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -150,7 +169,8 @@ TechnologiesWebHandler.getStatusHistory = function (req, res) {
         res.render('pages/statushistory',
             {
                 technology: value,
-                user: req.user
+                user: req.user,
+                messages: req.flash()
             });
     });
 };
@@ -160,6 +180,9 @@ TechnologiesWebHandler.getVotes = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -176,7 +199,8 @@ TechnologiesWebHandler.getVotes = function (req, res) {
         res.render('pages/votehistory',
             {
                 technology: value,
-                user: req.user
+                user: req.user,
+                messages: req.flash()
             });
     });
 };
@@ -186,6 +210,9 @@ TechnologiesWebHandler.updateStatus = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -203,7 +230,8 @@ TechnologiesWebHandler.updateStatus = function (req, res) {
             {
                 technology: value,
                 user: req.user,
-                statuses: statuses
+                statuses: statuses,
+                messages: req.flash()
             });
     });
 };
@@ -213,6 +241,9 @@ TechnologiesWebHandler.addProject = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
         res.redirect('/error');
         return;
     }
@@ -221,6 +252,7 @@ TechnologiesWebHandler.addProject = function (req, res) {
 
     technology.getById(req.user.id, techid, function (technology) {
         if (technology === null) {
+            req.flash("danger", "Technology not found");
             res.redirect('/error');
             return;
         } else {
@@ -235,7 +267,8 @@ TechnologiesWebHandler.addProject = function (req, res) {
                                 return linkedProjects.map(function (linkedEl) {
                                         return linkedEl.id
                                     }).indexOf(e.id) === -1;
-                            })
+                            }),
+                            messages: req.flash()
                         });
                 });
             });

@@ -30,6 +30,11 @@
             <li class="active">Add Stack</li>
         </ol>
     </div>
+
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-6" style="padding-left: 15px; padding-top: 40px;">
             <form action="javascript:void(0);" method="POST">
@@ -65,14 +70,17 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             success: function (result) {
-
                 if (result.success) {
                     location.href = "/stacks";
                 } else {
-                    alert("There was an error adding the stack :(");
+                    TechRadar.viewFlashMessages(result.messages);
                 }
             }
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Stack', 'add', frm.find('input[name="name"]').val());
+        <% } %>
     });
 
 </script>

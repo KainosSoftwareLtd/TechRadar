@@ -37,7 +37,7 @@ UsedThisTech.getUsersCountInLastDays = function (techid, daysAgo, done) {
         },
         function (error) {
             console.log(error);
-            done(null);
+            done(null, error);
     });
 }
 

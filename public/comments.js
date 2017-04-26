@@ -18,13 +18,21 @@ $(function() {
             contentType: "application/json",
             data: JSON.stringify({id: [commentId]}),
             complete: function (result) {
-                if (result.success) {
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    if(TechRadar.viewFlashMessages && response.messages) {
+                        sessionStorage.setItem("messages", JSON.stringify(response.messages));
+                    }
                     location.reload();
                 } else {
-                    alert("There was an error deleting comment :(");
+                    if(TechRadar.viewFlashMessages) {
+                        TechRadar.viewFlashMessages({danger:["There was an error deleting comment."]});
+                    }
                 }
             }
         });
+
+        ga('send', 'event', 'Comment', 'delete', commentId);
     };
 
     /**

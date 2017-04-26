@@ -39,6 +39,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div id="custom-toolbar">
@@ -61,11 +65,9 @@
 <script src="/lib/bootstrap-table/bootstrap-table.min.js"></script>
 <script src="/stickyTablePageSize.js"></script>
 <script>
-    
 
     $table = $('#results');
-
-    $addBtn = $('#addBtn')
+    $addBtn = $('#addBtn');
 
     // Disabled by default
     $addBtn.prop('disabled', 1);
@@ -146,26 +148,32 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
-                if (result.success) {
-                    location.href = "/project/<%=project.id%>";
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    sessionStorage.setItem("messages", JSON.stringify({"success":["Technologies added successfully"]}));
+                    location.href = "/project/<%= project.id %>";
                 } else {
-                    alert("There was an error adding Technologies");
+                    TechRadar.viewFlashMessages({"danger":["There was an error adding technologies"]});
                 }
                 $addBtn.removeClass("disabled");
             }
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Project', 'add technologies', '<%=project.name%>');
+        <% } %>
     });
 
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.id
+            return row.id;
         });
     }
 
     function getSelectedSoftwareVersionIds() {
         var selectedVersionIds = [];
         getIdSelections().forEach(function(selectedId) {
-            var versionId = $('#version-for-tech-'+selectedId).val();
+            var versionId = $('#version-for-tech-' + selectedId).val();
             selectedVersionIds.push(versionId);
         });
         return selectedVersionIds;

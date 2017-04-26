@@ -32,11 +32,7 @@ UsersApiHandler.addUser = function (req, res) {
     }
 
     if(!validationResult.valid) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        var data = {};
-        data.error = validationResult.message;
-        data.success = false;
-        res.end(JSON.stringify(data));
+        apiutils.handleResultWithFlash(req, res, null, validationResult.message);
         return;
     }
 
@@ -44,7 +40,7 @@ UsersApiHandler.addUser = function (req, res) {
         new User(null, username, email, sanitizer(req.body.displayName),
             password, null, sanitizer(req.body.role), enabled),
         function (result, error) {
-            apiutils.handleResultSet(res, result, error);
+            apiutils.handleResultWithFlash(req, res, result, error);
         });
 };
 
@@ -52,7 +48,7 @@ UsersApiHandler.addUserSignUp = function(req, res){
     req.body.role = 1; // prevent other roles than "user" from being set
     req.body.enabled = 'no'; // new user accounts are disabled by default
     UsersApiHandler.addUser(req, res);
-}
+};
 
 UsersApiHandler.updateProfile = function (req, res) {
     var oldPassword = sanitizer(req.body.oldPassword);
@@ -73,27 +69,27 @@ UsersApiHandler.updateProfile = function (req, res) {
         validationResult = userValidator.validateAvatar(req.file);
     }
     if(!validationResult.valid) {
-        apiutils.handleResultSet(res, null, validationResult.message);
+        apiutils.handleResultWithFlash(req, res, null, validationResult.message);
         return;
     }
 
     users.findById(req.user.id, function (error, userFromDb) {
         if(error) {
-            apiutils.handleResultSet(res, null, error);
+            apiutils.handleResultWithFlash(req, res, null, error);
         } else {
             if(password && userFromDb.password !== oldPasswordHash) {
                 // user wants to change the password but the old one is incorrect
-                apiutils.handleResultSet(res, null, "Old password is incorrect");
+                apiutils.handleResultWithFlash(req, res, null, "Old password is incorrect");
             } else {
                 var passwordHash = userFromDb.password;
                 if(password) {
                     passwordHash = crypto.createHash('sha256')
-                        .update(password).digest('base64')
+                        .update(password).digest('base64');
                 }
 
                 users.update(new User(req.user.id, userFromDb.username, email, displayName, passwordHash, avatarData, userFromDb.role, userFromDb.enabled), 
                     function (result, error) {
-                        apiutils.handleResultSet(res, result , error);
+                        apiutils.handleResultWithFlash(req, res, result, error);
                 });
             }
         }
@@ -122,34 +118,33 @@ UsersApiHandler.updateUser = function (req, res) {
         validationResult = userValidator.validateAvatar(req.file);
     }
     if(!validationResult.valid) {
-        apiutils.handleResultSet(res, null, validationResult.message);
+        apiutils.handleResultWithFlash(req, res, null, validationResult.message);
         return;
     }
 
     users.findById(userId, function (error, userFromDb) {
         if(error) {
-            apiutils.handleResultSet(res, null, error);
+            apiutils.handleResultWithFlash(req, res, null, error);
         } else {
             var passwordHash = userFromDb.password;
             if(password) {
                 passwordHash = crypto.createHash('sha256')
-                    .update(password).digest('base64')
+                    .update(password).digest('base64');
             }
             if(!email) {
                 email = userFromDb.email;
             }
 
             users.update(new User(userId, userFromDb.username, email, displayName, passwordHash, avatarData, role, enabled), function (result, error) {
-                apiutils.handleResultSet(res, result, error);
+                apiutils.handleResultWithFlash(req, res, result, error);
             });
         }
     });
 };
 
 UsersApiHandler.getAllUsers = function (req, res) {
-    users.getAll(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
+    users.getAll(function (error, result) {
+        apiutils.handleResultWithFlash(req, res, result, error);
     });
 };
 
@@ -157,14 +152,14 @@ UsersApiHandler.deleteUsers = function (req, res) {
     var data = req.body.id;
 
     users.delete(data, function(result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     });
 };
 
 UsersApiHandler.getAvatar = function (req, res) {
     var username = sanitizer(req.query.username);
     if(!username) {
-        apiutils.handleResultSet(res, null, "Username parameter missing");
+        apiutils.handleResultWithFlash(req, res, null, "Username parameter missing");
         return;
     }
 
@@ -174,8 +169,7 @@ UsersApiHandler.getAvatar = function (req, res) {
             data.result = result.toString('base64');
             data.success = true;
         } else {
-            data.error = error;
-            data.success = false;
+            apiutils.handleResultWithFlash(req, res, null, error);
         }
 
         res.writeHead(200, {

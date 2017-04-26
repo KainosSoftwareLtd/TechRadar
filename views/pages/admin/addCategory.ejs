@@ -31,6 +31,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../../partials/flash-messages.ejs %>
+    </div>
+
     <div class="col-md-8 col-md-offset-2" style="padding-top: 10px;">
         <form action="javascript:void(0);" method="POST">
             <div class="form-group">
@@ -68,9 +72,10 @@
             success: function (result) {
                 console.log(result);
                 if (result.success) {
+                    sessionStorage.setItem("messages", JSON.stringify(result.messages));
                     location.href = "/categories";
                 } else {
-                    alert("There was an error adding the category");
+                    TechRadar.viewFlashMessages({danger:["There was an error adding the category"]});
                 }
 
                 $(":submit").attr("disabled", false);

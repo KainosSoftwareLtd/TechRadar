@@ -13,15 +13,16 @@ describe("Tags api handler", function() {
 
     beforeEach(function() {
         req = res = {};
+        req.flash = sinon.spy();
         res.end = sinon.spy();
         res.writeHead = sinon.spy();     
-        apiUtilsSpy = sinon.stub(apiutils, 'handleResultSet');
+        apiUtilsSpy = sinon.stub(apiutils, 'handleResultWithFlash');
         testData = 'results';
         testError = 'error';
     });
 
     afterEach(function() {
-        apiutils.handleResultSet.restore();
+        apiutils.handleResultWithFlash.restore();
     });
 
     describe("getTags", function() {
@@ -46,13 +47,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.getTags(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.getTags(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
     });
 
@@ -79,13 +80,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.getAllWithOptionalProjectId(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.getAllWithOptionalProjectId(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
     });
 
@@ -112,13 +113,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.getForProject(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.getForProject(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
     });
 
@@ -159,13 +160,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.addTag(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.addTag(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
 
         it("should NOT call add() from tags DAO when validation fails", function() {
@@ -213,13 +214,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.deleteTags(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.deleteTags(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
     });
 
@@ -228,7 +229,7 @@ describe("Tags api handler", function() {
         var req = {
             body: {tags: [1, 22, 333]},
             params: {projectId: '53452'}
-        }
+        };
 
         beforeEach(function() {
             reassignToProjectSpy = sinon.stub(tagsDao, 'reassignToProject', function(projectId, tagIds, done) {
@@ -251,13 +252,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.reassignTagsToProject(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.reassignTagsToProject(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
 
     });
@@ -301,13 +302,13 @@ describe("Tags api handler", function() {
         it("should pass the results to the API handler", function() {
             apiTags.updateTag(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[1]).to.equal(testData);
+            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testData);
         });
 
         it("should pass the errors to the API handler", function() {
             apiTags.updateTag(req, res);
 
-            expect(apiUtilsSpy.getCalls()[0].args[2]).to.equal(testError);
+            expect(apiUtilsSpy.getCalls()[0].args[3]).to.equal(testError);
         });
 
         it("should NOT call update() from tags DAO when validation fails", function() {

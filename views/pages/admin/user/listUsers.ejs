@@ -39,6 +39,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../../../partials/flash-messages.ejs %>
+    </div>
+
     <div class="row">
         <div class="col-md-10 col-md-offset-1">
             <div id="custom-toolbar">
@@ -67,7 +71,7 @@
 
 
     $table = $('#results');
-    $deleteBtn = $('#deleteBtn')
+    $deleteBtn = $('#deleteBtn');
 
     // Disabled by default
     $deleteBtn.prop('disabled', 1);
@@ -84,7 +88,10 @@
         showRefresh: true,
         showPaginationSwitch: true,
         pagination: true,
-        pageSize: page_size, // declared and set in stickyTablePageSize.js 
+        pageSize: page_size, // declared and set in stickyTablePageSize.js
+        responseHandler: function(res) {
+            return res.result;
+        },
         columns: [{
             field:'state',
             checkbox:'true'
@@ -96,6 +103,7 @@
             field: 'username',
             title: 'Username',
             sortable: true,
+            searchFormatter: false,
             formatter: operateFormatter
         }, {
             field: 'displayname',
@@ -129,7 +137,7 @@
 
         $deleteBtn.addClass("disabled");
 
-        var data={};
+        var data = {};
         data.id = getIdSelections();
 
         $.ajax({
@@ -138,11 +146,13 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
+                console.log(result);
                 if (result.success) {
-                    $table.bootstrapTable('refresh' );
-                    $deleteBtn.prop('disabled', true );
+                    $table.bootstrapTable('refresh');
+                    $deleteBtn.prop('disabled', true);
+                    TechRadar.viewFlashMessages({"success": ["Deletion successful"]});
                 } else {
-                    alert("There was an error deleting technology :(");
+                    TechRadar.viewFlashMessages({"danger": ["There was an error while deleting users"]});
                 }
 
                 $deleteBtn.removeClass("disabled");
@@ -152,7 +162,7 @@
 
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.id
+            return row.id;
         });
     }
 
@@ -160,9 +170,9 @@
 
         var column = [];
         if( row['isadmin']) {
-            column = [ "<span class='glyphicon glyphicon-ok' aria-hidden='true'/>"]
+            column = ["<span class='glyphicon glyphicon-ok' aria-hidden='true'/>"];
         } else {
-            column = [ "<span class='glyphicon glyphicon-remove' aria-hidden='true'/>"]
+            column = ["<span class='glyphicon glyphicon-remove' aria-hidden='true'/>"];
         }
         return column;
     }

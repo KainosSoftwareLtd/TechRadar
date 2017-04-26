@@ -32,6 +32,10 @@
         </ol>
     </div>
 
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
+    </div>
+
     <div class="col-md-8 col-md-offset-2" style="padding-top: 10px;">
         <form action="javascript:void(0);" method="POST">
             <div class="form-group">
@@ -89,7 +93,7 @@
 <script>
 
     $("form").submit(function (event) {
-
+        $(":submit").attr("disabled", true);
 
         var technologyName = $("form [name=technologyName]").val();
         var technologyWebsite = $("form [name=technologyWebsite]").val();
@@ -99,11 +103,11 @@
         validationResult = validationResult.valid ? TechnologyValidator.validateTechnologyWebsite(technologyWebsite) : validationResult;
         validationResult = validationResult.valid ? TechnologyValidator.validateTechnologyLicenceWebsite(technologyLicenceLink) : validationResult;
         if (!validationResult.valid) {
-            alert(validationResult.message);
+            TechRadar.viewFlashMessages({"danger":[validationResult.message]});
+            $(":submit").attr("disabled", false);
             return;
         }
 
-        $(":submit").attr("disabled", true);
         var frm = $('form');
         var frmdata = serialiseForm(frm);
 
@@ -114,9 +118,10 @@
             data: JSON.stringify(frmdata),
             success: function (result) {
                 if (result.success) {
+                    sessionStorage.setItem("messages", JSON.stringify({"success":["Technology added"]}));
                     location.href = "/comments/add/" + result.result;
                 } else {
-                    alert("There was an error adding the technology. Perhaps a technology with the same name already exists.");
+                    TechRadar.viewFlashMessages({"danger":["There was an error adding the technology. Perhaps a technology with the same name already exists."]});
                 }
 
                 $(":submit").attr("disabled", false);

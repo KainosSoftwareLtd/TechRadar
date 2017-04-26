@@ -22,7 +22,7 @@
     <div class="container">
         <row>
             <div class="col-md-12">
-                <h1><%=project.name%></h1>
+                <h1><%= project.name %></h1>
                 <p>Remove Technologies</p>
             </div>
         </row>
@@ -34,9 +34,13 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/project/<%=project.id%>"><%=project.name%></a></li>
+            <li><a href="/project/<%= project.id %>"><%=project.name%></a></li>
             <li class="active">Remove Technology</li>
         </ol>
+    </div>
+
+    <div class="col-md-12">
+        <% include ../partials/flash-messages.ejs %>
     </div>
 
     <div class="row">
@@ -61,18 +65,16 @@
 <script src="/lib/bootstrap-table/bootstrap-table.min.js"></script>
 <script src="/stickyTablePageSize.js"></script>
 <script>
-    
 
     $table = $('#results');
-
-    $removeBtn = $('#removeBtn')
+    $removeBtn = $('#removeBtn');
 
     // Disabled by default
     $removeBtn.prop('disabled', 1);
 
     $table.bootstrapTable( {
         method: 'get',
-        url: '/api/project/<%=project.id%>/technologies',
+        url: '/api/project/<%= project.id %>/technologies',
         cache: false,
         striped: true,
         escape: true,
@@ -134,19 +136,26 @@
             contentType: "application/json",
             data: JSON.stringify(data),
             complete: function(result){
-                if (result.success) {
-                    location.href = "/project/<%=project.id%>";
+                var response = JSON.parse(result.responseText);
+                if (response.success) {
+                    sessionStorage.setItem("messages", JSON.stringify(response.messages));
+                    location.href = "/project/<%= project.id %>";
                 } else {
-                    alert("There was an error adding Technologies");
+                    TechRadar.viewFlashMessages({"danger":["There was an error with deleting Technologies"]});
                 }
+
                 $removeBtn.removeClass("disabled");
             }
         });
+
+        <% if (google_id != undefined) { %>
+            ga('send', 'event', 'Project', 'remove technologies', '<%=project.name%>');
+        <% } %>
     });
 
     function getIdSelections() {
         return $.map($table.bootstrapTable('getSelections'), function (row) {
-            return row.linkid
+            return row.linkid;
         });
     }
 

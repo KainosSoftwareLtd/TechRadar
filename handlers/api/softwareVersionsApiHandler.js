@@ -21,7 +21,7 @@ SoftwareVersionsApiHandler.addVersion = function (req, res) {
     var name = sanitizer(req.body.name.trim());
 
     versionsDao.add(techId, name, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     })
 };
 
@@ -34,12 +34,15 @@ SoftwareVersionsApiHandler.updateVersion = function (req, res) {
 
     var errors = req.validationErrors();
     if (errors) {
-        res.end(JSON.stringify({success: false, error: errors}));
+        errors.forEach(function(e) {
+            req.flash("danger", e.msg);
+        });
+        apiutils.handleResultWithFlash(req, res, null, errors, false, true);
         return;
     }
 
     versionsDao.update(versionId, name, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     })
 };
 
@@ -47,7 +50,7 @@ SoftwareVersionsApiHandler.deleteVersions = function (req, res) {
     var versions = req.body.versions;
 
     versionsDao.delete(versions, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
+        apiutils.handleResultWithFlash(req, res, result, error);
     })
 };
 
