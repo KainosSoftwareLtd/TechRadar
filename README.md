@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/KainosSoftwareLtd/TechRadar.png?label=ready&title=Ready)](https://waffle.io/KainosSoftwareLtd/TechRadar)
 # [Tech Radar](http://gpimblott.github.io/TechRadar/)
 
 Main documentation is located here -> http://gpimblott.github.io/TechRadar/
