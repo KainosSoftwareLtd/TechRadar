@@ -1,14 +1,12 @@
-var comments = require('../../dao/comments.js');
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-var security = require('../../utils/security.js');
-var handler = require('../../handlers/api/commentApiHandler.js');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/commentApiHandler.js');
 
-var ApiCommentRoutes = function () {
+const ApiCommentRoutes = function () {
 };
 
 ApiCommentRoutes.createRoutes = function (self) {
-
     /**
      * Add a new comment for a technology
      */

@@ -11,8 +11,8 @@ const User = require('../models/User.js');
 const config = require('./configAzureAD');
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 
-var strategyConfig = {
-    callbackURL: config.creds.returnURL,
+let strategyConfig = {
+    redirectUrl: config.creds.returnURL,
     realm: config.creds.realm,
     clientID: config.creds.clientID,
     clientSecret: config.creds.clientSecret,
@@ -27,7 +27,7 @@ var strategyConfig = {
     loggingLevel: config.creds.loggingLevel
 };
 
-var log = bunyan.createLogger({
+let log = bunyan.createLogger({
   name: 'TechRadar - passport.js',
   streams: [{
     stream: process.stderr,
@@ -61,11 +61,12 @@ passport.use(new LocalStrategy(
                 });
             }
 
-            var userHash = require('crypto').createHash('sha256').update(password).digest('base64');
+            const userHash = require('crypto').createHash('sha256').update(password).digest('base64');
 
-            if (user.password != userHash) {
+            if (user.password !== userHash) {
                 return cb(null, false, { message: 'Incorrect login'});
             }
+
             return cb(null, user);
         });
     }));
@@ -75,7 +76,7 @@ passport.use(new OIDCStrategy(strategyConfig,
     function (profile, done) {
         // Depending on the type of the account e.g. registered in live.com or kainos.com
         // user's email may be returned in "unique_name" field instead of "email"
-        var email = profile._json.email || profile._json.unique_name
+        const email = profile._json.email || profile._json.unique_name;
         if (!email) {
             return done(new Error("No email found"), null);
         }
@@ -115,10 +116,11 @@ passport.use(new OIDCStrategy(strategyConfig,
  */
 function registerUserUsingProfileData(profileJson, done) {
     log.info("Registering a new user with email: " + profileJson.email);
-    var email = profileJson.email || profileJson.unique_name;
+    let email = profileJson.email || profileJson.unique_name;
+
     // password is required, so we need to provide one even when the true password is handled by ADFS
-    var randomPassword = require('crypto').randomBytes(256).toString();
-    var newUser = new User(null, profileJson.unique_name, email, profileJson.name, randomPassword, null, 2, true);
+    let randomPassword = require('crypto').randomBytes(256).toString();
+    let newUser = new User(null, profileJson.unique_name, email, profileJson.name, randomPassword, null, 2, true);
     users.add(newUser, function(userId, error){
         log.info("Getting user with id = " + userId + " from the database");
         users.findById(userId, function(err, user){

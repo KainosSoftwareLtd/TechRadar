@@ -1,10 +1,7 @@
-var pg = require('pg');
-var dbhelper = require('../utils/dbhelper.js');
+const dbhelper = require('../utils/dbhelper.js');
 
-
-var Technology = function () {
+const Technology = function () {
 };
-
 
 /**
  * Add a new technology
@@ -18,8 +15,9 @@ var Technology = function () {
  * @returns ID of the row created
  */
 Technology.add = function (name, website, category, description, licence, licencelink,  done) {
-    var sql = "INSERT INTO technologies ( name , website, category , description, licence, licencelink ) values ($1, $2, $3, $4, $5, $6 ) returning id";
-    var params = [name, website, category, description, licence, licencelink];
+    const sql = `INSERT INTO technologies ( name , website, category , description, licence, licencelink ) 
+                    values ($1, $2, $3, $4, $5, $6 ) returning id`;
+    const params = [name, website, category, description, licence, licencelink];
 
     dbhelper.insert(sql, params,
         function (result) {
@@ -44,9 +42,9 @@ Technology.add = function (name, website, category, description, licence, licenc
  * @returns true/false
  */
 Technology.update = function (id, name, website, category, description, licence, licencelink, done) {
-    var sql = "UPDATE technologies SET name=$1 , website=$2, category=$3, description=$4, licence=$6, licencelink=$7 where id=$5";
-    var params = [name, website, category, description, id, licence, licencelink];
-
+    const sql = `UPDATE technologies SET name=$1 , website=$2, category=$3, description=$4, licence=$6, licencelink=$7
+                    WHERE id=$5`;
+    const params = [name, website, category, description, id, licence, licencelink];
 
     dbhelper.insert(sql, params,
         function (result) {
@@ -64,13 +62,12 @@ Technology.update = function (id, name, website, category, description, licence,
  * @param done
  */
 Technology.delete = function (ids, done) {
-
-    var params = [];
-    for (var i = 1; i <= ids.length; i++) {
+    let params = [];
+    for (let i = 1; i <= ids.length; i++) {
         params.push('$' + i);
     }
 
-    var sql = "DELETE FROM TECHNOLOGIES WHERE id IN (" + params.join(',') + "  )";
+    const sql = "DELETE FROM TECHNOLOGIES WHERE id IN (" + params.join(',') + "  )";
 
     dbhelper.query(sql, ids,
         function (result) {
@@ -91,8 +88,9 @@ Technology.delete = function (ids, done) {
  * @param done Function to call when the update is finished
  */
 Technology.updateStatus = function (technology, status, reason, userid, done) {
-    var sql = "INSERT INTO tech_status_link ( technologyid ,statusid , userid , reason ) VALUES ( $1 , $2 , $3 , $4) returning id";
-    var params = [technology, status, userid, reason];
+    const sql = `INSERT INTO tech_status_link ( technologyid ,statusid , userid , reason )
+                    VALUES ( $1 , $2 , $3 , $4) returning id`;
+    const params = [technology, status, userid, reason];
 
     dbhelper.insert(sql, params,
         function (result) {
@@ -111,18 +109,18 @@ Technology.updateStatus = function (technology, status, reason, userid, done) {
  * @param done Function to call with the results
  */
 Technology.getById = function (userid, id, done) {
-    var sql = "SELECT t.* ,s.name as statusName, s.id as status, c.name as categoryName," +
-        " COALESCE( " +
-            "(select s2.name from votes v " +
-            "JOIN STATUS s2 on s2.id=v.status WHERE userid=$1 AND technology=t.id order by date desc limit 1), " +
-            "'TBD') as vote" +
-        " FROM technologies t " +
-        " INNER JOIN categories c on t.category=c.id " +
-        " LEFT OUTER JOIN status s on s.id = " +
-        "    COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )" +
-        " where t.id=$2";
+    const sql = `SELECT t.* ,s.name as statusName, s.id as status, c.name as categoryName,
+        COALESCE( 
+            (select s2.name from votes v 
+            JOIN STATUS s2 on s2.id=v.status WHERE userid=$1 AND technology=t.id order by date desc limit 1),
+            'TBD') as vote
+        FROM technologies t 
+        INNER JOIN categories c on t.category=c.id 
+        LEFT OUTER JOIN status s on s.id = 
+            COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )
+        WHERE t.id=$2`;
     
-    var params = [userid, id];
+    const params = [userid, id];
     dbhelper.query(sql, params ,
         function (results) {
             if (results.length != 1) {
@@ -142,16 +140,15 @@ Technology.getById = function (userid, id, done) {
  * @param done Function to call with the results
  */
 Technology.getAll = function (userid, done) {
-    var sql = "SELECT t.id, t.name as name, t.website as website, t.description, t.licence, t.licencelink, " +
-        "s.name as status, c.name as category, " +
-        "COALESCE( " +
-        "(select s2.name from votes v " +
-        "join status s2 on s2.id=v.status where userid=$1 and technology=t.id order by date desc limit 1), " +
-        "'TBD') as vote" +
-        " FROM technologies t" +
-        " INNER JOIN categories c on t.category=c.id" +
-        " LEFT OUTER JOIN status s on s.id = " +
-        "    COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )";
+    const sql = `SELECT t.id, t.name as name, t.website as website, t.description, t.licence, t.licencelink, 
+        s.name as status, c.name as category, 
+        COALESCE( ( select s2.name from votes v 
+                    join status s2 on s2.id=v.status where userid=$1 and technology=t.id order by date desc limit 1), 
+                'TBD') as vote
+         FROM technologies t
+         INNER JOIN categories c on t.category=c.id
+         LEFT OUTER JOIN status s on s.id =
+            COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )`;
 
 
     dbhelper.query(sql, [userid],
@@ -172,8 +169,8 @@ Technology.getTechnologiesWithUserCounts = function (limit, done) {
     if (!(limit > 0) && !(limit < 40)) {
         limit = 40;
     }
-    var params = [limit];
-    var sql = `
+    const params = [limit];
+    const sql = `
         SELECT t.name, t.category, s.id AS status_id, COUNT(used.*) 
             FROM technologies AS t
         INNER JOIN used_this_technology used
@@ -203,14 +200,15 @@ Technology.getTechnologiesWithUserCounts = function (limit, done) {
  */
 Technology.getAllForCategory = function (cname, done) {
 
-    var sql = "SELECT row_number() over (order by s) as num, t.id, t.name as name, t.website as website, t.description, " +
-        "t.licence, t.licencelink, s.name as status, c.name as category " +
-        " FROM technologies t" +
-        " INNER JOIN categories c on t.category=c.id" +
-        " LEFT OUTER JOIN status s on s.id = " +
-        "    COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )" +
-        " WHERE LOWER(c.name)=$1" +
-        " ORDER BY status, t.name ASC";
+    const sql =
+        `SELECT row_number() over (order by s) as num, t.id, t.name as name, t.website as website, t.description, 
+                    t.licence, t.licencelink, s.name as status, c.name as category 
+         FROM technologies t
+         INNER JOIN categories c on t.category=c.id
+         LEFT OUTER JOIN status s on s.id = 
+            COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )
+         WHERE LOWER(c.name)=$1
+         ORDER BY status, t.name ASC`;
 
 
     dbhelper.query(sql, [cname],
@@ -230,7 +228,7 @@ Technology.getAllForCategory = function (cname, done) {
  */
 Technology.getAllForProject = function (id, done) {
     // 'num' field has the same value for technologies with the same id
-    var sql = "SELECT dense_rank() over (order by t.id) as num, t.*," + 
+    const sql = "SELECT dense_rank() over (order by t.id) as num, t.*," + 
         " row_number() over (order by s) AS row_num," +
         " s.name as status, ver.id AS versionid, ver.name AS version, tpl.id AS linkid" +
         " FROM technologies t" +
@@ -259,7 +257,7 @@ Technology.getAllForProject = function (id, done) {
  */
 Technology.search = function (value, done) {
 
-    var sql =
+    const sql =
         "SELECT t.id, t.name as name, t.website as website, t.description, t.licence, t.licencelink, " +
         "s.name as status, c.name as category " +
         " FROM technologies t" +
@@ -287,15 +285,15 @@ Technology.search = function (value, done) {
  * @param done Function to call when the addition is finished
  */
 Technology.addProject = function (technologyId, projectId, versionId, done) {
-    var optionalVersionPlaceholder = ", null";
-    var params = [technologyId, projectId];
+    const params = [technologyId, projectId];
+    let optionalVersionPlaceholder = ", null";
 
     if(versionId) {
         params.push(versionId);
         optionalVersionPlaceholder = ", $3";
     }
 
-    var sql = "INSERT INTO technology_project_link (technologyid, projectid, software_version_id)" + 
+    const sql = "INSERT INTO technology_project_link (technologyid, projectid, software_version_id)" + 
         " VALUES ($1, $2 " + optionalVersionPlaceholder + ")";
 
     dbhelper.insert(sql, params,
@@ -316,16 +314,16 @@ Technology.addProject = function (technologyId, projectId, versionId, done) {
  * @param done Function to call when the deletion is finished
  */
 Technology.removeProjects = function (technologyId, projectIds, done) {
-    var idPlaceholders = [];
-    for (var i = 2; i <= projectIds.length + 1; i++) {
+    const idPlaceholders = [];
+    for (const i = 2; i <= projectIds.length + 1; i++) {
         idPlaceholders.push('$' + i);
     }
 
-    var sql = "DELETE FROM technology_project_link" +
+    const sql = "DELETE FROM technology_project_link" +
         " WHERE technologyid = $1 " +
         " and projectid IN (" + idPlaceholders.join(',') + ")";
 
-    var params = [technologyId];
+    let params = [technologyId];
     params = params.concat(projectIds);
 
     dbhelper.query(sql, params,
@@ -341,7 +339,7 @@ Technology.removeProjects = function (technologyId, projectIds, done) {
 Technology.getMostUsedTechnologies = function ( done ) {
     // status_id is used by dashboard graphs
     // SQL in COALESCE selects the most recent status id
-    var sql = `WITH tech_in_projects AS (
+    const sql = `WITH tech_in_projects AS (
         SELECT t.name, s.id AS status_id
         FROM technology_project_link tpl 
         JOIN technologies t on tpl.technologyid=t.id

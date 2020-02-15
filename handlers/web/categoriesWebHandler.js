@@ -1,9 +1,8 @@
-var cache = require('../../dao/cache.js');
-var users = require('../../dao/users');
-var technology = require('../../dao/technology');
-var _ = require('underscore');
+const cache = require('../../dao/cache.js');
+const technology = require('../../dao/technology');
+const _ = require('underscore');
 
-var CategoriesWebHandler = function () {
+const CategoriesWebHandler = function () {
 };
 
 /**
@@ -19,7 +18,7 @@ CategoriesWebHandler.addCategory = function (req, res) {
 
 CategoriesWebHandler.technologiesForCategory = function (req, res) {
 
-    var cname = decodeURI(req.params.category);
+    const cname = decodeURI(req.params.category);
     technology.getAllForCategory(cname.toLowerCase(), function (values) {
 
         if (values == null) {
@@ -29,7 +28,7 @@ CategoriesWebHandler.technologiesForCategory = function (req, res) {
 
         // groups technologies by status into the following structure: 
         // [{ status: key, technologies: [technologies where status==key]}]
-        var technologiesInGroups = _.chain(values).groupBy('status')
+        const technologiesInGroups = _.chain(values).groupBy('status')
             .map(function(technologies, key) {
                 return {
                     status: key,
@@ -37,7 +36,7 @@ CategoriesWebHandler.technologiesForCategory = function (req, res) {
                 };
             }).value();
 
-        var category = cache.getCategory(cname);
+        const category = cache.getCategory(cname);
 
         res.render('pages/categoryRadar', {
             category: category,

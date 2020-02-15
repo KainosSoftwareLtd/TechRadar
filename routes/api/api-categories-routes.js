@@ -1,11 +1,9 @@
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/categoriesApiHandler.js');
 
-var security = require('../../utils/security.js');
-
-var handler = require('../../handlers/api/categoriesApiHandler.js');
-
-var ApiCategoryRoutes = function () {
+const ApiCategoryRoutes = function () {
 };
 
 ApiCategoryRoutes.createRoutes = function (self) {

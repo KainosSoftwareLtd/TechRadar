@@ -1,7 +1,7 @@
-var pg = require('pg');
-var dbhelper = require('../utils/dbhelper.js');
+const pg = require('pg');
+const dbhelper = require('../utils/dbhelper.js');
 
-var UsedThisTech = function () {
+const UsedThisTech = function () {
 };
 
 /**
@@ -10,7 +10,7 @@ var UsedThisTech = function () {
  * @param done Function to call with the results
  */
 UsedThisTech.getAllOptions = function (done) {
-    var sql = "SELECT * from used_this_technology_options";
+    const sql = "SELECT * from used_this_technology_options";
 
     dbhelper.query(sql, null,
         function (results) {
@@ -20,11 +20,11 @@ UsedThisTech.getAllOptions = function (done) {
             console.log(error);
             done(null);
         });
-}
+};
 
 UsedThisTech.getUsersCountInLastDays = function (techid, daysAgo, done) {
-    var params = [techid];
-    var sql = "SELECT COUNT(*) FROM used_this_technology WHERE technology=$1";
+    const params = [techid];
+    let sql = "SELECT COUNT(*) FROM used_this_technology WHERE technology=$1";
 
     if(daysAgo != undefined && dbhelper.isInt(daysAgo)) {
         // can't use $2 param here, daysAgo is guaranteed to be an integer
@@ -39,7 +39,7 @@ UsedThisTech.getUsersCountInLastDays = function (techid, daysAgo, done) {
             console.log(error);
             done(null);
     });
-}
+};
 
 /**
  * Get users that used the technology along with dates of last use
@@ -48,7 +48,7 @@ UsedThisTech.getUsersCountInLastDays = function (techid, daysAgo, done) {
  * @param done Function to call with the results
  */
 UsedThisTech.getUsersForTechnology = function (techid, limit, done) {
-    var sql = "SELECT to_char(used.date, 'DD/MM/YY') as date,t.name as technology, u.username, u.email, u.displayname" +
+    let sql = "SELECT to_char(used.date, 'DD/MM/YY') as date,t.name as technology, u.username, u.email, u.displayname" +
         " FROM used_this_technology used" +
         " INNER JOIN technologies t on used.technology=t.id " +
         " INNER JOIN users u on used.userid=u.id " +
@@ -56,8 +56,8 @@ UsedThisTech.getUsersForTechnology = function (techid, limit, done) {
         " ORDER BY used.date desc";
 
 
-    var params = [techid];
-    if (limit != null && limit != "undefined") {
+    const params = [techid];
+    if (limit != null && limit !== "undefined") {
         sql += " limit $2";
         params.push(limit);
     }
@@ -70,7 +70,7 @@ UsedThisTech.getUsersForTechnology = function (techid, limit, done) {
             console.log(error);
             done(null);
         });
-}
+};
 
 /**
  * Add a new used_this_technology vote
@@ -81,14 +81,14 @@ UsedThisTech.getUsersForTechnology = function (techid, limit, done) {
  * @param done Function called when complete
  */
 UsedThisTech.add = function (technology, daysAgo, userId, done) {
-    var date = new Date();
+    const date = new Date();
     date.setDate(date.getDate() - daysAgo);
 
     dbhelper.query("SELECT id FROM used_this_technology WHERE technology=$1 and userid=$2", [technology, userId],
         function (selectResult) {
             if (selectResult[0] != undefined && selectResult[0].id != undefined) {
 
-                var id = selectResult[0].id;
+                const id = selectResult[0].id;
 
                 dbhelper.query("UPDATE used_this_technology set date=$1 where id=$2", [date, id],
 
@@ -99,7 +99,8 @@ UsedThisTech.add = function (technology, daysAgo, userId, done) {
                         done(null, error);
                     });
             } else {
-                dbhelper.insert("INSERT INTO used_this_technology ( technology, date, userid ) values ($1, $2, $3) returning id",
+                dbhelper.insert(
+                    "INSERT INTO used_this_technology ( technology, date, userid ) values ($1, $2, $3) returning id",
                     [technology, date, userId],
 
                     function (insertResult) {
@@ -113,7 +114,7 @@ UsedThisTech.add = function (technology, daysAgo, userId, done) {
         function (error) {
             done(null, error);
         });
-}
+};
 
 
 module.exports = UsedThisTech;

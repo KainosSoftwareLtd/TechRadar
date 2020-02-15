@@ -1,21 +1,12 @@
-var technology = require('../../dao/technology.js');
-var status = require('../../dao/status.js');
-var votes = require('../../dao/vote.js');
-var project = require('../../dao/projects.js');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/technologyApiHandler.js');
 
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-
-var passport = require('passport');
-var security = require('../../utils/security.js');
-
-var handler = require('../../handlers/api/technologyApiHandler.js');
-
-var ApiTechnologyRoutes = function () {
+const ApiTechnologyRoutes = function () {
 };
 
 ApiTechnologyRoutes.createRoutes = function (self) {
-
     /**
      * Add a vote for a technology
      */
@@ -98,7 +89,6 @@ ApiTechnologyRoutes.createRoutes = function (self) {
      * Remove links to Projects
      */
     self.app.delete('/api/technology/:technology/projects', security.canEdit, jsonParser, handler.removeProject );
-
-}
+};
 
 module.exports = ApiTechnologyRoutes;

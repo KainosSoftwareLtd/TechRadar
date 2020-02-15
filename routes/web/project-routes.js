@@ -1,7 +1,7 @@
-var handler = require('../../handlers/web/projectsWebHandler');
-var security = require('../../utils/security.js');
+const handler = require('../../handlers/web/projectsWebHandler');
+const security = require('../../utils/security.js');
 
-var ProjectRoutes = function () {
+const ProjectRoutes = function () {
 };
 
 
@@ -52,7 +52,7 @@ ProjectRoutes.createRoutes = function (self) {
      * Edit all tags
      */
     self.app.get('/projects/tags/edit', security.isAuthenticated, handler.editTags);
-}
+};
 
 
 module.exports = ProjectRoutes;

@@ -1,6 +1,7 @@
-var users = require('../../dao/users');
+const users = require('../../dao/users');
+const {check, validationResult} = require('express-validator');
 
-var UsersWebHandler = function () {
+const UsersWebHandler = function () {
 };
 
 UsersWebHandler.list = function (req, res) {
@@ -16,10 +17,11 @@ UsersWebHandler.editProfile = function (req, res) {
 };
 
 UsersWebHandler.editUser = function (req, res) {
-    req.checkParams('userId', 'Invalid user id').isInt();
+    check('userId', 'Invalid user id').isInt();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.redirect('/error');
         return;
     }
@@ -27,13 +29,11 @@ UsersWebHandler.editUser = function (req, res) {
     users.findById(req.params.userId, function (error, editUser) {
         if (error) {
             res.redirect_to('/error');
-            return;
         } else {
             res.render('pages/admin/user/editUser', {user: req.user, editUser: editUser});
         }
     });
 
 };
-
 
 module.exports = UsersWebHandler;

@@ -1,9 +1,8 @@
-var handler = require('../../handlers/web/categoriesWebHandler.js');
-var security = require('../../utils/security.js');
+const handler = require('../../handlers/web/categoriesWebHandler.js');
+const security = require('../../utils/security.js');
 
-var CategoryRoutes = function () {
+const CategoryRoutes = function () {
 };
-
 
 CategoryRoutes.createRoutes = function (self) {
 

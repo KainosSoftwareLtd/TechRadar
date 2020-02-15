@@ -1,16 +1,12 @@
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/dashboardApiHandler.js');
 
-var security = require('../../utils/security.js');
-
-var handler = require('../../handlers/api/dashboardApiHandler.js');
-
-var ApiDashboardRoutes = function () {
+const ApiDashboardRoutes = function () {
 };
 
 ApiDashboardRoutes.createRoutes = function (self) {
-
-  
     /**
      * Get all votes for all technologies
      */
@@ -40,7 +36,6 @@ ApiDashboardRoutes.createRoutes = function (self) {
      * Get all technologies with users count
      */
     self.app.get('/api/dash/technology/usersCount', security.isAuthenticated, jsonParser, handler.getTechnologiesWithUsersCount);
-
 };
 
 module.exports = ApiDashboardRoutes;

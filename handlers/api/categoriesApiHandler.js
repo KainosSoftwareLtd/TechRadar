@@ -1,10 +1,9 @@
-var cache = require('../../dao/cache.js');
-var category = require('../../dao/category.js');
+const cache = require('../../dao/cache.js');
+const category = require('../../dao/category.js');
+const sanitizer = require('sanitize-html');
+const apiutils = require('./apiUtils.js');
 
-var sanitizer = require('sanitize-html');
-var apiutils = require('./apiUtils.js');
-
-var CategoriesApiHandler = function () {
+const CategoriesApiHandler = function () {
 };
 
 /**
@@ -33,7 +32,7 @@ CategoriesApiHandler.addCategory = function (app) {
 
 CategoriesApiHandler.deleteCategories = function (app) {
     return function (req, res) {
-        var data = req.body.id ;
+        const data = req.body.id ;
 
         category.delete( data , function( result , error ) {
             if(result) {

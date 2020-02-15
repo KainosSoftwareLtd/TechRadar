@@ -1,29 +1,20 @@
 /**
  *  These are the routes implement the REST API services
  */
+const stacks = require('../../dao/stacks.js');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const sanitizer = require('sanitize-html');
+const apiutils = require('./apiUtils.js');
 
-var stacks = require('../../dao/stacks.js');
-
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-
-var passport = require('passport');
-
-var security = require('../../utils/security.js');
-
-var sanitizer = require('sanitize-html');
-
-var apiutils = require('./apiUtils.js');
-
-var ApiStackRoutes = function () {
+const ApiStackRoutes = function () {
 };
 
 /*****************************************************
  * API Interfaces
  ******************************************************/
 ApiStackRoutes.createRoutes = function (self) {
-
-
     /**
      * Get all stacks
      */
@@ -55,14 +46,13 @@ ApiStackRoutes.createRoutes = function (self) {
      */
     self.app.delete('/api/stack', security.isAuthenticatedAdmin, jsonParser,
         function (req, res) {
-            var data = req.body.id ;
+            const data = req.body.id ;
 
             stacks.delete( data , function( result , error ) {
                 apiutils.handleResultSet( res, result , error );
             })
         });
-
-}
+};
 
 
 module.exports = ApiStackRoutes;

@@ -1,15 +1,16 @@
-var sanitizer = require('sanitize-html');
-var apiutils = require('./apiUtils.js');
-var versionsDao = require('../../dao/softwareVersions.js');
+const sanitizer = require('sanitize-html');
+const apiutils = require('./apiUtils.js');
+const versionsDao = require('../../dao/softwareVersions.js');
+const {check, validationResult} = require('express-validator');
 
-var SoftwareVersionsApiHandler = function () {
+const SoftwareVersionsApiHandler = function () {
 };
 
 /**
  * Get all SoftwareVersions
  */
 SoftwareVersionsApiHandler.getAllVersionsForTechnology = function (req, res) {
-    var techId = sanitizer(req.params.technology);
+    const techId = sanitizer(req.params.technology);
     versionsDao.getAllForTechnology(techId, function (result) {
         res.writeHead(200, {"Content-Type": "application/json"});
         res.end(JSON.stringify(result));
@@ -17,8 +18,8 @@ SoftwareVersionsApiHandler.getAllVersionsForTechnology = function (req, res) {
 };
 
 SoftwareVersionsApiHandler.addVersion = function (req, res) {
-    var techId = sanitizer(req.body.technology);
-    var name = sanitizer(req.body.name.trim());
+    const techId = sanitizer(req.body.technology);
+    const name = sanitizer(req.body.name.trim());
 
     versionsDao.add(techId, name, function (result, error) {
         apiutils.handleResultSet(res, result, error);
@@ -26,14 +27,14 @@ SoftwareVersionsApiHandler.addVersion = function (req, res) {
 };
 
 SoftwareVersionsApiHandler.updateVersion = function (req, res) {
-    var versionId = sanitizer(req.body.version);
-    var name = sanitizer(req.body.name.trim());
+    const versionId = sanitizer(req.body.version);
+    const name = sanitizer(req.body.name.trim());
 
-    req.checkBody('version', 'Invalid version ID').isInt();
-    req.checkBody('name', 'Empty name').notEmpty();
+    check('version', 'Invalid version ID').isInt();
+    check('name', 'Empty name').notEmpty();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
         res.end(JSON.stringify({success: false, error: errors}));
         return;
     }
@@ -44,7 +45,7 @@ SoftwareVersionsApiHandler.updateVersion = function (req, res) {
 };
 
 SoftwareVersionsApiHandler.deleteVersions = function (req, res) {
-    var versions = req.body.versions;
+    const versions = req.body.versions;
 
     versionsDao.delete(versions, function (result, error) {
         apiutils.handleResultSet(res, result, error);

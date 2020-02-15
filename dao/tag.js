@@ -1,10 +1,8 @@
-var pg = require('pg');
-var dbhelper = require('../utils/dbhelper.js');
+const pg = require('pg');
+const dbhelper = require('../utils/dbhelper.js');
 
-
-var Tag = function () {
+const Tag = function () {
 };
-
 
 /**
  * Add a new tag
@@ -13,7 +11,7 @@ var Tag = function () {
  * @returns ID of the row created
  */
 Tag.add = function (name, done) {
-    var sql = "INSERT INTO tags (name) values ($1) returning id";
+    const sql = "INSERT INTO tags (name) values ($1) returning id";
 
     dbhelper.insert(sql, [name],
         function (result) {
@@ -33,8 +31,8 @@ Tag.add = function (name, done) {
  * @returns ID of the row created
  */
 Tag.update = function (tagId, name, done) {
-    var params = [tagId, name];
-    var sql = "UPDATE tags SET name=$2 WHERE id=$1"; 
+    const params = [tagId, name];
+    const sql = "UPDATE tags SET name=$2 WHERE id=$1"; 
 
     dbhelper.insert(sql, params,
         function (result) {
@@ -52,8 +50,7 @@ Tag.update = function (tagId, name, done) {
  * @param done
  */
 Tag.detachAllFromProject = function (projectId, done) {
-
-    var sql = "DELETE FROM tag_project_link WHERE projectid=$1";
+    const sql = "DELETE FROM tag_project_link WHERE projectid=$1";
 
     dbhelper.query(sql, [projectId],
         function (result) {
@@ -72,13 +69,12 @@ Tag.detachAllFromProject = function (projectId, done) {
  * @param done
  */
 Tag.attachToProject = function (projectId, tagIds, done) {
+    let sql = `INSERT INTO tag_project_link(tagid, projectid) VALUES`;
 
-    var sql = `INSERT INTO tag_project_link(tagid, projectid) VALUES`;
-
-    var params = [projectId];
+    const params = [projectId];
     params.push.apply(params, tagIds);
 
-    var placeholderPairs = tagIds.map(function(tagId, index) {
+    const placeholderPairs = tagIds.map(function(tagId, index) {
         // gives us (tagId, projectId) placeholders to insert after the VALUES statement
         return "($" + (index + 2) + ", $1)"; // tagId placeholders start from $2
     });
@@ -102,12 +98,12 @@ Tag.attachToProject = function (projectId, tagIds, done) {
  */
 Tag.delete = function (ids, done) {
 
-    var params = [];
-    for (var i = 1; i <= ids.length; i++) {
+    const params = [];
+    for (const i = 1; i <= ids.length; i++) {
         params.push('$' + i);
     }
 
-    var sql = "DELETE FROM tags WHERE id IN (" + params.join(',') + "  )";
+    const sql = "DELETE FROM tags WHERE id IN (" + params.join(',') + "  )";
 
     dbhelper.query(sql, ids,
         function (result) {
@@ -133,10 +129,9 @@ Tag.getAll = function (done) {
  * @param done Function to call with the results
  */
 Tag.getAllForProject = function (projectId, done) {
-    var sql = `SELECT * FROM tag_project_link tpl
+    const sql = `SELECT * FROM tag_project_link tpl
         INNER JOIN tags t ON t.id=tpl.tagid 
-        WHERE projectid=$1
-    ;`;
+        WHERE projectid=$1`;
 
     dbhelper.query(sql, [projectId],
         function (results) {
@@ -154,7 +149,7 @@ Tag.getAllForProject = function (projectId, done) {
  * @param done Function to call with the results
  */
 Tag.getById = function (tagId, done) {
-    var sql = `SELECT * FROM tags WHERE id=$1;`;
+    const sql = `SELECT * FROM tags WHERE id=$1;`;
 
     dbhelper.query(sql, [tagId],
         function (results) {
@@ -173,10 +168,9 @@ Tag.getById = function (tagId, done) {
  */
 Tag.getAllWithOptionalProjectId = function (projectId, done) {
     // If a tag doesn't belong to the project, the projectid field is empty
-    var sql = `SELECT t.*, tpl.projectid, tpl.id AS linkid FROM tags t
+    const sql = `SELECT t.*, tpl.projectid, tpl.id AS linkid FROM tags t
         LEFT JOIN tag_project_link tpl ON tpl.tagid=t.id AND tpl.projectid=$1
-        ORDER BY projectid, name
-    `;
+        ORDER BY projectid, name`;
 
     dbhelper.query(sql, [projectId],
         function (results) {
@@ -201,6 +195,5 @@ Tag.reassignToProject = function (projectId, tagIds, done) {
         }
     });
 };
-
 
 module.exports = Tag;

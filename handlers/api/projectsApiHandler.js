@@ -1,12 +1,11 @@
-var cache = require('../../dao/cache');
-var projects = require('../../dao/projects');
-var technology = require('../../dao/technology');
+const projects = require('../../dao/projects');
+const technology = require('../../dao/technology');
+const apiutils = require('./apiUtils.js');
+const sanitizer = require('sanitize-html');
+const projectValidator = require('../../shared/validators/projectValidator.js');
+const {check, validationResult} = require('express-validator');
 
-var apiutils = require('./apiUtils.js');
-var sanitizer = require('sanitize-html');
-var projectValidator = require('../../shared/validators/projectValidator.js');
-
-var ProjectsApiHandler = function () {
+const ProjectsApiHandler = function () {
 };
 
 
@@ -19,7 +18,7 @@ ProjectsApiHandler.getProjects = function (req, res) {
 };
 
 ProjectsApiHandler.getProjectsForTag = function (req, res) {
-    var tagId = sanitizer(req.params.tagId);
+    const tagId = sanitizer(req.params.tagId);
 
     projects.getAllForTag(tagId, function (result, error) {
         apiutils.handleResultSet(res, result, error);
@@ -28,13 +27,13 @@ ProjectsApiHandler.getProjectsForTag = function (req, res) {
 
 ProjectsApiHandler.addProject = function (req, res) {
 
-    var projectName = sanitizer(req.body.projectname.trim());
-    var projectDescription = sanitizer(req.body.description);
+    const projectName = sanitizer(req.body.projectname.trim());
+    const projectDescription = sanitizer(req.body.description);
 
-    var validationResult = projectValidator.validateProjectName(projectName);
+    const validationResult = projectValidator.validateProjectName(projectName);
     if (!validationResult.valid) {
         res.writeHead(200, {"Content-Type": "application/json"});
-        var data = {};
+        const data = {};
         data.error = validationResult.message;
         data.success = false;
         res.end(JSON.stringify(data));
@@ -53,7 +52,7 @@ ProjectsApiHandler.addProject = function (req, res) {
 
 
 ProjectsApiHandler.deleteProject = function (req, res) {
-    var data = req.body.id;
+    const data = req.body.id;
 
     projects.delete(data, function (result, error) {
         apiutils.handleResultSet(res, result, error);
@@ -61,7 +60,7 @@ ProjectsApiHandler.deleteProject = function (req, res) {
 };
 
 ProjectsApiHandler.deleteTechnologiesFromProject = function (req, res) {
-    var linkIds = req.body.links;
+    const linkIds = req.body.links;
 
     projects.deleteTechnologies(linkIds, function (result, error) {
         apiutils.handleResultSet(res, result, error);
@@ -69,14 +68,15 @@ ProjectsApiHandler.deleteTechnologiesFromProject = function (req, res) {
 };
 
 ProjectsApiHandler.updateTechnologyVersion = function (req, res) {
-    var versionId = sanitizer(req.body.version);
-    var linkId = sanitizer(req.params.linkId);
+    const versionId = sanitizer(req.body.version);
+    const linkId = sanitizer(req.params.linkId);
     
-    req.checkParams('linkId', 'Invalid technology-project link ID').isInt();
-    req.checkBody('version', 'Invalid version ID').isInt();
+    check('linkId', 'Invalid technology-project link ID').isInt();
+    check('version', 'Invalid version ID').isInt();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.end(JSON.stringify({success: false, error: errors}));
         return;
     }
@@ -87,7 +87,7 @@ ProjectsApiHandler.updateTechnologyVersion = function (req, res) {
 };
 
 ProjectsApiHandler.getTechnologiesForProject = function (req, res) {
-    var projectId = sanitizer(req.params.projectId);
+    const projectId = sanitizer(req.params.projectId);
 
     technology.getAllForProject(projectId, function (error, result) {
         res.writeHead(200, {"Content-Type": "application/json"});
@@ -97,9 +97,9 @@ ProjectsApiHandler.getTechnologiesForProject = function (req, res) {
 
 
 ProjectsApiHandler.addTechnologyToProject = function (req, res) {
-    var projectId = sanitizer(req.params.projectId);
-    var technologyIds = req.body.technologies;
-    var versionIds = req.body.versions;
+    const projectId = sanitizer(req.params.projectId);
+    const technologyIds = req.body.technologies;
+    const versionIds = req.body.versions;
 
     projects.addTechnologies(projectId, technologyIds, versionIds, function (result, error) {
         apiutils.handleResultSet(res, result, error);

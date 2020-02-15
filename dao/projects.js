@@ -1,7 +1,7 @@
-var pg = require('pg');
-var dbhelper = require('../utils/dbhelper.js');
+const pg = require('pg');
+const dbhelper = require('../utils/dbhelper.js');
 
-var Projects = function () {
+const Projects = function () {
 };
 
 /**
@@ -9,7 +9,7 @@ var Projects = function () {
  * @param done function to call with the results
  */
 Projects.getAll = function (done) {
-    var sql = `SELECT p.*, string_agg(t.id::character varying, ', ') AS tags 
+    const sql = `SELECT p.*, string_agg(t.id::character varying, ', ') AS tags 
         FROM projects AS p
         LEFT OUTER JOIN tag_project_link tpl ON tpl.projectid=p.id
         LEFT OUTER JOIN tags t ON tpl.tagid=t.id
@@ -24,7 +24,7 @@ Projects.getAll = function (done) {
             console.log(error);
             return done(error, null);
         });
-}
+};
 
 /**
  * Get a project by ID
@@ -32,7 +32,7 @@ Projects.getAll = function (done) {
  * @param done Function to call with the result
  */
 Projects.findById = function (id, done) {
-    var sql = "SELECT *" +
+    const sql = "SELECT *" +
         " FROM projects " +
         " where projects.id=$1 ";
 
@@ -56,9 +56,7 @@ Projects.findById = function (id, done) {
  * @param done Function to call with the result
  */
 Projects.findByName = function (name, done) {
-    var sql = "SELECT *" +
-        " FROM projects " +
-        " where lower(projects.name)=lower($1) ";
+    const sql = `SELECT * FROM projects WHERE lower(projects.name)=lower($1)`;
 
     dbhelper.query(sql, [name],
         function (results) {
@@ -83,18 +81,18 @@ Projects.findByName = function (name, done) {
  * @param callback Function to call when the update is finished
  */
 Projects.addTechnologies = function (projectId, technologyIds, softwareVersionIds, callback) {
-    var sql = "INSERT INTO technology_project_link (technologyid, projectid, software_version_id) VALUES ";
+    let sql = "INSERT INTO technology_project_link (technologyid, projectid, software_version_id) VALUES ";
 
-    var numRows = technologyIds.length;
-    for (var i = 0; i < numRows; i++) {
-        var optionalVersionId = getOptionalVersionId(softwareVersionIds[i]);
+    const numRows = technologyIds.length;
+    for (let i = 0; i < numRows; i++) {
+        const optionalVersionId = getOptionalVersionId(softwareVersionIds[i]);
         sql += " ( $" + (i+1) + "," + projectId + optionalVersionId + ")";
         if (i != numRows - 1) {
             sql += ",";
         }
     }
 
-    var params = technologyIds;
+    const params = technologyIds;
 
     dbhelper.insert(sql, params,
         function (result) {
@@ -113,12 +111,12 @@ Projects.addTechnologies = function (projectId, technologyIds, softwareVersionId
  */
 Projects.deleteTechnologies = function (ids, done) {
 
-    var params = [];
-    for (var i = 1; i <= ids.length; i++) {
+    let params = [];
+    for (const i = 1; i <= ids.length; i++) {
         params.push('$' + i);
     }
 
-    var sql = "DELETE FROM technology_project_link WHERE id IN (" + params.join(',') + " )";
+    let sql = "DELETE FROM technology_project_link WHERE id IN (" + params.join(',') + " )";
 
     dbhelper.query(sql, ids,
         function (result) {
@@ -128,7 +126,7 @@ Projects.deleteTechnologies = function (ids, done) {
             console.log(error);
             done(false, error);
         });
-}
+};
 
 /**
  * Changes the version assigned to a technology used in a project
@@ -138,8 +136,8 @@ Projects.deleteTechnologies = function (ids, done) {
  */
 Projects.updateTechnologyVersion = function (versionId, linkId, done) {
 
-    var params = [versionId, linkId];
-    var sql = `UPDATE technology_project_link SET software_version_id =
+    const params = [versionId, linkId];
+    const sql = `UPDATE technology_project_link SET software_version_id =
     	COALESCE(
             (SELECT $1::integer WHERE NOT EXISTS (SELECT 1 FROM technology_project_link WHERE software_version_id = $1 AND projectid =
                 -- look for duplicates only in the same project
@@ -156,7 +154,7 @@ Projects.updateTechnologyVersion = function (versionId, linkId, done) {
             console.log(error);
             done(false, error);
         })
-}
+};
 
 /**
  * Add a new project
@@ -164,7 +162,7 @@ Projects.updateTechnologyVersion = function (versionId, linkId, done) {
  * @done function to call with the result
  */
 Projects.add = function (name, description, done) {
-    var sql = "INSERT INTO projects ( name, description ) values ( $1 , $2 ) returning id";
+    const sql = "INSERT INTO projects ( name, description ) values ( $1 , $2 ) returning id";
 
     dbhelper.insert(sql, [name, description],
         function (result) {
@@ -174,7 +172,7 @@ Projects.add = function (name, description, done) {
             console.log(error);
             done(null, error);
         });
-}
+};
 
 /**
  * Delete a set of projects using their ID numbers
@@ -183,13 +181,13 @@ Projects.add = function (name, description, done) {
  */
 Projects.delete = function (ids, done) {
     dbhelper.deleteByIds("PROJECTS", ids, done);
-}
+};
 
 /**
  * Update project data
  */
 Projects.update = function (id, name, description, done) {
-    var sql = "UPDATE projects SET name=$1, description=$2 where id=$3";
+    const sql = "UPDATE projects SET name=$1, description=$2 where id=$3";
 
     dbhelper.query(sql, [name, description, id],
         function (result) {
@@ -208,10 +206,11 @@ Projects.update = function (id, name, description, done) {
  * @param done function to call with the results
  */
 Projects.getAllForTechnology = function (technologyId, done) {
-    var sql = "SELECT DISTINCT p.* from projects p" +
-        " INNER JOIN technology_project_link tpl on p.id = tpl.projectid" +
-        " where tpl.technologyid = $1" +
-        " ORDER BY p.name ASC";
+    const sql =
+        `SELECT DISTINCT p.* from projects p 
+         INNER JOIN technology_project_link tpl on p.id = tpl.projectid 
+         where tpl.technologyid = $1
+         ORDER BY p.name ASC`;
 
     dbhelper.query(sql, [technologyId],
         function (result) {
@@ -230,7 +229,7 @@ Projects.getAllForTechnology = function (technologyId, done) {
  * @param done function to call with the results
  */
 Projects.getAllForTag = function (tagId, done) {
-    var sql = 
+    const sql = 
         `WITH projects_containing_tag AS (
             SELECT p.* FROM projects p
             INNER JOIN tag_project_link tpl  
@@ -257,10 +256,11 @@ Projects.getAllForTag = function (tagId, done) {
  * Get all of the technologies used by each project
  */
 Projects.getTechForProject = function (id, done) {
-    var sql = "SELECT p.name as project, t.name as technology FROM technology_project_link tpl" +
-        " JOIN projects p on tpl.projectid=p.id" +
-        " JOIN technologies t on tpl.technologyid=t.id" +
-        " WHERE p.id=$1";
+    const sql =
+        `SELECT p.name as project, t.name as technology FROM technology_project_link tpl
+         JOIN projects p on tpl.projectid=p.id
+         JOIN technologies t on tpl.technologyid=t.id
+         WHERE p.id=$1;`;
 
     dbhelper.query(sql, [id],
         function (result) {
@@ -270,7 +270,7 @@ Projects.getTechForProject = function (id, done) {
             console.log(error);
             done(null, error);
         });
-}
+};
 
 /**
  * Checks whether versionId can be used in an SQL query,
@@ -279,7 +279,7 @@ Projects.getTechForProject = function (id, done) {
  * @returns ", null" or ", {integer}"
  */
 function getOptionalVersionId(versionId) {
-    var optionalVersionId = ", null";
+    let optionalVersionId = ", null";
     if(dbhelper.isInt(versionId)) {
         optionalVersionId = "," + versionId;
     }

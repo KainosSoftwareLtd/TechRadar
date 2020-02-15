@@ -1,9 +1,10 @@
-var projects = require('../../dao/projects');
-var tags = require('../../dao/tag');
-var technology = require('../../dao/technology');
-var _ = require('underscore');
+const projects = require('../../dao/projects');
+const tags = require('../../dao/tag');
+const technology = require('../../dao/technology');
+const _ = require('underscore');
+const {check, validationResult} = require('express-validator');
 
-var ProjectsWebHandler = function () {
+const ProjectsWebHandler = function () {
 };
 
 ProjectsWebHandler.add = function (req, res) {
@@ -11,10 +12,11 @@ ProjectsWebHandler.add = function (req, res) {
 };
 
 ProjectsWebHandler.reassignTags = function (req, res) {
-    req.checkParams('projectId', 'Invalid project id').isInt();
+    check('projectId', 'Invalid project id').isInt();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.redirect('/error');
         return;
     }
@@ -27,7 +29,6 @@ ProjectsWebHandler.reassignTags = function (req, res) {
         tags.getAllWithOptionalProjectId(req.params.projectId, function (tags, tagsError) {
             if (tagsError) {
                 res.redirect('/error');
-                return;
             } else {
                 res.render('pages/reassignTags', {user: req.user, tags: tags, project: project});
             }
@@ -42,8 +43,9 @@ ProjectsWebHandler.editTags = function (req, res) {
 };
 
 ProjectsWebHandler.edit = function (req, res) {
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.redirect('/error');
         return;
     }
@@ -51,7 +53,6 @@ ProjectsWebHandler.edit = function (req, res) {
     projects.findById(req.params.projectId, function (error, project) {
         if (error) {
             res.redirect('/error');
-            return;
         } else {
             res.render('pages/admin/editProject', {user: req.user, project: project});
         }
@@ -59,10 +60,11 @@ ProjectsWebHandler.edit = function (req, res) {
 };
 
 ProjectsWebHandler.addTechnology = function (req, res) {
-    req.checkParams('projectId', 'Invalid project id').isInt();
+    check('projectId', 'Invalid project id').isInt();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.redirect('/error');
         return;
     }
@@ -77,10 +79,11 @@ ProjectsWebHandler.addTechnology = function (req, res) {
 };
 
 ProjectsWebHandler.removeTechnology = function (req, res) {
-    req.checkParams('projectId', 'Invalid project id').isInt();
+    check('projectId', 'Invalid project id').isInt();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.redirect('/error');
         return;
     }
@@ -95,19 +98,18 @@ ProjectsWebHandler.removeTechnology = function (req, res) {
 };
 
 ProjectsWebHandler.showRadar = function (req, res) {
-    req.checkParams('projectId', 'Invalid project id').isInt();
+    check('projectId', 'Invalid project id').isInt();
 
-    var errors = req.validationErrors();
-    if (errors) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        console.log(errors);
         res.redirect('/error');
         return;
     }
 
     projects.findById(req.params.projectId, function (error, project) {
-
         if (error) {
             res.redirect('/error');
-            return;
         } else {
             technology.getAllForProject(project.id, function (error, technologies) {
                 if (error) {
@@ -119,7 +121,7 @@ ProjectsWebHandler.showRadar = function (req, res) {
                         } else {
                             // groups technologies by status into the following structure: 
                             // [{ status: key, technologies: [technologies where status==key]}]
-                            var technologiesInGroups = _.chain(technologies).groupBy('status')
+                            const technologiesInGroups = _.chain(technologies).groupBy('status')
                                 .map(function(technologies, key) {
                                     return {
                                         status: key,
@@ -143,11 +145,10 @@ ProjectsWebHandler.showRadar = function (req, res) {
 };
 
 ProjectsWebHandler.list = function (req, res) {
-
     // check if a project name parameter has been specified
-    var name = req.query.name;
+    let name = req.query.name;
 
-    if( name==undefined) {
+    if( name===undefined) {
         res.render('pages/searchProjects', {user: req.user});
     } else {
         name = decodeURI(name);
@@ -160,12 +161,10 @@ ProjectsWebHandler.list = function (req, res) {
             }
         })
     }
-
 };
 
 ProjectsWebHandler.listForTag = function (req, res) {
-
-    var tagId = req.params.tagId;
+    let tagId = req.params.tagId;
 
     tags.getById(tagId, function(tag, error) {
         if(error) {

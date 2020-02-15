@@ -9,7 +9,7 @@
             return { valid: false, message: "Technology Name too long" };
         }
 
-        var pattern = /^[A-Za-z0-9]/;
+        const pattern = /^[A-Za-z0-9]/;
 
         if(!pattern.test(name)) {
             return { valid: false, message: "Technology name must start with a character/digit"};

@@ -1,19 +1,12 @@
-var projects = require('../../dao/projects');
-var technologies = require('../../dao/technology');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/projectsApiHandler');
 
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-
-var passport = require('passport');
-var security = require('../../utils/security.js');
-
-var handler = require('../../handlers/api/projectsApiHandler');
-
-var ApiProjectRoutes = function () {
+const ApiProjectRoutes = function () {
 };
 
 ApiProjectRoutes.createRoutes = function (self) {
-
     /**
      * Get all projects
      */
@@ -60,7 +53,6 @@ ApiProjectRoutes.createRoutes = function (self) {
      * Update project
      */
     self.app.put('/api/project', security.canEdit, handler.updateProject);
-
-}
+};
 
 module.exports = ApiProjectRoutes;

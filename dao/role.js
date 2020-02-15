@@ -1,10 +1,10 @@
-var pg = require('pg');
-var dbhelper = require('../utils/dbhelper.js');
+const pg = require('pg');
+const dbhelper = require('../utils/dbhelper.js');
 
 /**
  * Database routines for 'Role's'
  */
-var Role = function () {
+const Role = function () {
 };
 
 /**
@@ -13,8 +13,6 @@ var Role = function () {
  */
 Role.getAll = function(done) {
     dbhelper.getAllFromTable("roles", done, "name"  );
-}
-
-
+};
 
 module.exports = Role;

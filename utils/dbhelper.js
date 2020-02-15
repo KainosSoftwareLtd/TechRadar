@@ -1,16 +1,16 @@
 /**
  * Helper function to perform base database operations (e.g. query, insert)
  */
-var pg = require('pg');
-var url = require('url')
+const pg = require('pg');
+const url = require('url');
 
-var DBHelper = {};
+const DBHelper = {};
 
 pg.defaults.poolSize = 50;
 
-var params = url.parse(process.env.DATABASE_URL);
-var auth = params.auth.split(':');
-var config = {
+const params = url.parse(process.env.DATABASE_URL);
+const auth = params.auth.split(':');
+const config = {
     user: auth[0],
     password: auth[1],
     host: params.hostname,
@@ -69,12 +69,12 @@ DBHelper.insert = function (sql, parameters, done, error) {
  */
 DBHelper.deleteByIds = function (tableName, ids, done) {
 
-    var params = [];
-    for (var i = 1; i <= ids.length; i++) {
+    let params = [];
+    for (let i = 1; i <= ids.length; i++) {
         params.push('$' + i);
     }
 
-    var sql = "DELETE FROM " + tableName + " WHERE id IN (" + params.join(',') + "  )";
+    const  sql = "DELETE FROM " + tableName + " WHERE id IN (" + params.join(',') + "  )";
     
     DBHelper.query(sql, ids,
         function (result) {
@@ -84,12 +84,11 @@ DBHelper.deleteByIds = function (tableName, ids, done) {
             console.log(error);
             done(false, error);
         });
-    
 };
 
 DBHelper.getAllFromTable = function( tableName , done , order ) {
-    var sql = "SELECT * FROM " + tableName;
-    var params = [];
+    let sql = `SELECT * FROM ${tableName}`;
+    let params = [];
 
     if( order != null) {
         sql = sql + " ORDER BY $1";
@@ -109,7 +108,7 @@ DBHelper.getAllFromTable = function( tableName , done , order ) {
 
 DBHelper.isInt = function(value) {
     return !isNaN(value) && 
-        parseInt(Number(value)) == value && 
+        parseInt(Number(value)) === value &&
         !isNaN(parseInt(value, 10));
 };
 

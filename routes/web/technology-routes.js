@@ -1,18 +1,14 @@
-var handler = require('../../handlers/web/technologiesWebHandler');
+const handler = require('../../handlers/web/technologiesWebHandler');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const passport = require('passport');
+const security = require('../../utils/security.js');
 
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-
-var passport = require('passport');
-var security = require('../../utils/security.js');
-
-var TechnologyRoutes = function () {
+const TechnologyRoutes = function () {
 };
 
 
 TechnologyRoutes.createRoutes = function (self) {
-
-
     /**
      * Show the technology search page
      */
@@ -67,8 +63,6 @@ TechnologyRoutes.createRoutes = function (self) {
      * List all the technologies
      */
     self.app.get('/technologies', security.isAuthenticatedAdmin,  handler.listTechnologies );
-
-
-}
+};
 
 module.exports = TechnologyRoutes;

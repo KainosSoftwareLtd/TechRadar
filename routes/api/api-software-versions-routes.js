@@ -1,14 +1,12 @@
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/softwareVersionsApiHandler.js');
 
-var security = require('../../utils/security.js');
-var handler = require('../../handlers/api/softwareVersionsApiHandler.js');
-
-var ApiSoftwareVersionsRoutes = function () {
+const ApiSoftwareVersionsRoutes = function () {
 };
 
 ApiSoftwareVersionsRoutes.createRoutes = function (self) {
-
     /**
      * Get all versions for technology 
      */
@@ -28,7 +26,6 @@ ApiSoftwareVersionsRoutes.createRoutes = function (self) {
      * Update software versions
      */
     self.app.put('/api/versions', security.canEdit, jsonParser, handler.updateVersion);
-
-}
+};
 
 module.exports = ApiSoftwareVersionsRoutes;

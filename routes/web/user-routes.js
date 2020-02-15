@@ -1,12 +1,11 @@
-var handler = require('../../handlers/web/usersWebHandler');
-var security = require('../../utils/security');
+const handler = require('../../handlers/web/usersWebHandler');
+const security = require('../../utils/security');
 
-var UserRoutes = function () {
+const UserRoutes = function () {
 };
 
 
 UserRoutes.createRoutes = function (self) {
-
     /**
      * Users page
      */
@@ -28,7 +27,7 @@ UserRoutes.createRoutes = function (self) {
      */
     self.app.get('/user/:userId/edit', security.isAuthenticatedAdmin, handler.editUser);
 
-}
+};
 
 
 module.exports = UserRoutes;

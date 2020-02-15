@@ -1,10 +1,8 @@
-var handler = require('../../handlers/web/commentsWebHandler');
-var security = require('../../utils/security');
+const handler = require('../../handlers/web/commentsWebHandler');
+const security = require('../../utils/security');
 
-
-var CommentRoutes = function () {
+const CommentRoutes = function () {
 };
-
 
 CommentRoutes.createRoutes = function (self) {
 

@@ -1,15 +1,12 @@
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const security = require('../../utils/security.js');
+const handler = require('../../handlers/api/tagsApiHandler.js');
 
-var security = require('../../utils/security.js');
-
-var handler = require('../../handlers/api/tagsApiHandler.js');
-
-var ApiTagRoutes = function () {
+const ApiTagRoutes = function () {
 };
 
 ApiTagRoutes.createRoutes = function (self) {
-    
     self.app.get('/api/tags', security.isAuthenticated, handler.getTags);
     self.app.get('/api/project/:projectId/tags/all', security.isAuthenticated, handler.getAllWithOptionalProjectId);
     self.app.get('/api/project/:projectId/tags/forProject', security.isAuthenticated, handler.getForProject);

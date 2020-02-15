@@ -1,14 +1,13 @@
 /**
  *  Main routes for the Application
  */
+const technology = require('../../dao/technology.js');
+const passport = require('passport');
+const security = require('../../utils/security');
+const {check, validationResult} = require('express-validator');
 
-var technology = require('../../dao/technology.js');
 
-var passport = require('passport');
-var security = require('../../utils/security');
-
-
-var Routes = function () {
+const Routes = function () {
 };
 
 /**
@@ -21,8 +20,8 @@ Routes.createRoutes = function (self) {
      */
     self.app.get('/', security.isAuthenticated,
         function (req, res) {
-            var url = req.session.redirect_to;
-            if (url != undefined) {
+            const url = req.session.redirect_to;
+            if (url !== undefined) {
                 delete req.session.redirect_to;
                 res.redirect(url);
             }
@@ -50,7 +49,7 @@ Routes.createRoutes = function (self) {
         if (req.isAuthenticated()) {
             res.redirect('/');
         } else {
-            var messages = req.flash('error');
+            const messages = req.flash('error');
             res.render('pages/login', {messages: messages});
         }
     });
@@ -71,16 +70,16 @@ Routes.createRoutes = function (self) {
     });
 
     self.app.get('/mindmap/project/:project', security.isAuthenticated, function (req, res) {
-        req.checkParams('project', 'Invalid project name').isAlpha();
+        check('project', 'Invalid project name').isAlpha();
 
-        var errors = req.validationErrors();
-        if (errors) {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            console.log(errors);
             res.redirect('/error');
             return;
         }
 
-        var pid = req.params.project;
-
+        const pid = req.params.project;
         technology.getAllForProject(pid, function (error, result) {
             if (error) {
                 console.log(error);

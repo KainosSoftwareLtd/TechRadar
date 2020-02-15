@@ -1,15 +1,12 @@
-var users = require('../../dao/users');
+const users = require('../../dao/users');
+const technology = require('../../dao/technology');
+const comments = require('../../dao/comments');
+const bodyParser = require('body-parser');
+const jsonParser = bodyParser.json();
+const passport = require('passport');
+const security = require('../../utils/security');
 
-var technology = require('../../dao/technology');
-var comments = require('../../dao/comments');
-
-var bodyParser = require('body-parser');
-var jsonParser = bodyParser.json();
-
-var passport = require('passport');
-var security = require('../../utils/security');
-
-var StackRoutes = function () {
+const StackRoutes = function () {
 };
 
 
@@ -26,6 +23,6 @@ StackRoutes.createRoutes = function (self) {
         res.render('pages/addStack', {user: req.user});
     });
 
-}
+};
 
 module.exports = StackRoutes;

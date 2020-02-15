@@ -1,7 +1,7 @@
-var pg = require('pg');
-var dbhelper = require('../utils/dbhelper.js');
+const pg = require('pg');
+const dbhelper = require('../utils/dbhelper.js');
 
-var SoftwareVersions = function () {
+const SoftwareVersions = function () {
 };
 
 /**
@@ -9,11 +9,11 @@ var SoftwareVersions = function () {
  * @param done Function to call with the results
  */
 SoftwareVersions.getAllForTechnology = function (technology, done) {
-    var sql = `SELECT sv.id, sv.name, sv.technology, COUNT(tpl.projectid) AS projects_count from software_versions AS sv         
+    const sql = `SELECT sv.id, sv.name, sv.technology, COUNT(tpl.projectid) AS projects_count from software_versions AS sv         
         LEFT OUTER JOIN technology_project_link tpl ON tpl.software_version_id = sv.id
         WHERE sv.technology=$1
         GROUP BY sv.id, sv.name, sv.technology`;
-    var params = [technology];
+    const params = [technology];
 
     dbhelper.query(sql, params,
         function (results) {
@@ -23,16 +23,15 @@ SoftwareVersions.getAllForTechnology = function (technology, done) {
             console.log(error);
             done(null);
         });
-}
+};
 
 /**
  * Add a new version that's assigned to a single technology
  * @param done Function to call with the results
  */
 SoftwareVersions.add = function (technology, name, done) {
-    var sql = `INSERT INTO software_versions(technology, name)
-        VALUES($1, $2) RETURNING id`;
-    var params = [technology, name];
+    const sql = `INSERT INTO software_versions(technology, name) VALUES($1, $2) RETURNING id`;
+    const params = [technology, name];
 
     dbhelper.insert(sql, params,
         function (results) {
@@ -42,7 +41,7 @@ SoftwareVersions.add = function (technology, name, done) {
             console.log(error);
             done(null);
         });
-}
+};
 
 /**
  * Update a version
@@ -51,8 +50,8 @@ SoftwareVersions.add = function (technology, name, done) {
  * @param done Function to call with the results
  */
 SoftwareVersions.update = function (version, name, done) {
-    var params = [version, name];
-    var sql = `UPDATE software_versions SET name=
+    const params = [version, name];
+    const sql = `UPDATE software_versions SET name=
         COALESCE(
             (SELECT $2::varchar WHERE NOT EXISTS (SELECT 1 FROM software_versions WHERE name = $2)),
             -- use the original name if the new name is a duplicate
@@ -76,6 +75,6 @@ SoftwareVersions.update = function (version, name, done) {
  */
 SoftwareVersions.delete = function (versions, done) {
     dbhelper.deleteByIds("software_versions" , versions, done );
-}
+};
 
 module.exports = SoftwareVersions;
