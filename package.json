@@ -1,6 +1,6 @@
 {
   "name": "TechRadar",
-  "version": "1.0.0",
+  "version": "1.5.0",
   "description": "Prototype Tech Radar",
   "scripts": {
     "test": "DATABASE_URL=postgres://username:password@hostname:5432/databasename mocha"
@@ -11,15 +11,15 @@
   ],
   "author": {
     "name": "Gordon Pimblott",
-    "email": "gordon@pimblott.com"
+    "email": "g.pimblott@kainos.com"
   },
   "repository": {
     "type": "git",
     "url": "https://git.heroku.com/techradar-demo.git"
   },
   "engines": {
-    "node": "6.9.1",
-    "npm": "3.10.8"
+    "node": "12.10.0",
+    "npm": "6.10.3"
   },
   "dependencies": {
     "async": "latest",
