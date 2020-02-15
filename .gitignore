@@ -5,3 +5,4 @@ uploads/
 .vscode/
 .eslintrc.json
 launch.json
+/tr-error.log
