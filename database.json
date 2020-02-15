@@ -1,7 +1,18 @@
 {
-    "defaultEnv": "pgEnv",
-    "pgEnv": {
+    "prod": {
         "driver": "pg",
         "ENV": "DATABASE_URL"
+    },
+    "dev": {
+        "ENV": "DATABASE_URL"
+    },
+    "local": {
+        "driver": "pg",
+        "user": "docker",
+        "password": "docker",
+        "host": "localhost",
+        "database": "rag",
+        "port": "5435",
+        "schema": "public"
     }
 }

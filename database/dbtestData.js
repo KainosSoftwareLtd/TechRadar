@@ -1,22 +1,22 @@
 /**
  * This is a stand-alone application that inserts base data into the database
  * 
- * It assumes that the database has already been dreated
+ * It assumes that the database has already been created
  */
 
 // Load in the environment variables
 require('dotenv').config({path:'process.env'});
 
-var pg = require('pg');
-var async = require('async');
+const pg = require('pg');
+const async = require('async');
 
-var client = new pg.Client(process.env.DATABASE_URL);
+const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 
 
-var hpassword = require('crypto').createHash('sha256').update('letmein').digest('base64');
+const hpassword = require('crypto').createHash('sha256').update('letmein').digest('base64');
 
-var statements = [
+const statements = [
     "DELETE FROM comments",
     "DELETE FROM votes",
     "DELETE FROM technologies",

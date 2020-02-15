@@ -1,7 +1,7 @@
 .idea/
 node_modules/
 uploads/
-/process.env
+/process.env.prod
 .vscode/
 .eslintrc.json
 launch.json
