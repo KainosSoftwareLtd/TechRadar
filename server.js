@@ -9,6 +9,9 @@ require('console-stamp')(console, '[ddd mmm dd HH:MM:ss]]');
 // Load in the environment variables
 require('dotenv').config({path: 'process.env'});
 
+// Logger setup
+const logger = require('./winstonLogger')(module);
+
 // Express
 const express = require('express');
 const helmet = require('helmet');
@@ -77,7 +80,7 @@ const TechRadar = function () {
                 Date(Date.now()), sig);
             process.exit(1);
         }
-        console.log('%s: Node server stopped.', Date(Date.now()));
+        logger.info('Server stopped');
     };
 
 
@@ -126,11 +129,10 @@ const TechRadar = function () {
             extended: true
         }));
 
-       // self.app.use(expressValidator());
         self.app.use(flash());
 
         self.app.use(function(err, req, res, next) {
-            console.error(err.stack);
+            logger.error('Fatal Error: %s', err.stack);
             res.status(500).send('A Fatal error has occurred');
         });
 
@@ -146,7 +148,7 @@ const TechRadar = function () {
  
         if (self.app.get('env')  === 'production') {
             self.app.enable('trust proxy', 1); // trusts first proxy - Heroku load balancer
-            console.log("In production mode");
+            logger.info('In production mode');
             self.app.use(express_enforces_ssl());
             sess.cookie.secure = true;
         }
@@ -156,8 +158,8 @@ const TechRadar = function () {
         // Setup the Google Analytics ID if defined
         self.app.locals.google_id = process.env.GOOGLE_ID || undefined;
 
-        console.log("GA ID:" + self.app.locals.google_id);
-        console.log("Cookie key:" + cookie_key);
+        logger.info('GA ID: %s', self.app.locals.google_id);
+        logger.info('Cookie key: %s', cookie_key);
         
         // Browser Cache
         const oneDay = 86400000;
@@ -174,10 +176,11 @@ const TechRadar = function () {
         cache.refresh(self.app);
 
         // Create all the routes and refresh the cache
-        routes.createRoutes(self);
-        technologyRoutes.createRoutes(self);
+        self.app.use('/', routes);
+        self.app.use('/technology', technologyRoutes);
+        self.app.use( '/category', categoryRoutes);
+
         stackRoutes.createRoutes(self);
-        categoryRoutes.createRoutes(self);
         projectRoutes.createRoutes(self);
         userRoutes.createRoutes(self);
         commentRoutes.createRoutes(self);
@@ -200,8 +203,7 @@ const TechRadar = function () {
     self.start = function () {
         //  Start the app on the specific interface (and port).
         self.app.listen(self.port, function () {
-            console.log('%s: Node server started on %s:%d ...',
-                Date(Date.now()), self.port);
+            logger.info('Server started on port %d', self.port);
         });
     };
 };

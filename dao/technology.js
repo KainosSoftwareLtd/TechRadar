@@ -67,7 +67,7 @@ Technology.delete = function (ids, done) {
         params.push('$' + i);
     }
 
-    const sql = "DELETE FROM TECHNOLOGIES WHERE id IN (" + params.join(',') + "  )";
+    const sql = "DELETE FROM technologies WHERE id IN (" + params.join(',') + "  )";
 
     dbhelper.query(sql, ids,
         function (result) {
@@ -258,13 +258,13 @@ Technology.getAllForProject = function (id, done) {
 Technology.search = function (value, done) {
 
     const sql =
-        "SELECT t.id, t.name as name, t.website as website, t.description, t.licence, t.licencelink, " +
-        "s.name as status, c.name as category " +
-        " FROM technologies t" +
-        " INNER JOIN categories c on t.category=c.id" +
-        " LEFT OUTER JOIN status s on s.id = " +
-        "    COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )" +
-        " WHERE technologies.name ILIKE $1 AND tsl2.id IS NULL";
+        `SELECT t.id, t.name as name, t.website as website, t.description, t.licence, t.licencelink, 
+        s.name as status, c.name as category 
+         FROM technologies t
+         INNER JOIN categories c on t.category=c.id
+         LEFT OUTER JOIN status s on s.id = 
+            COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )
+         WHERE t.name ILIKE $1`;
 
     dbhelper.query(sql, ['%' + value + '%'],
         function (results) {

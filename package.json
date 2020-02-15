@@ -52,7 +52,8 @@
     "pg-large-object": "latest",
     "sanitize-html": "latest",
     "sinon": "latest",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "winston": "^3.2.1"
   },
   "devDependencies": {},
   "bundleDependencies": [],

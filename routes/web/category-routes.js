@@ -1,26 +1,28 @@
+'use strict';
+/**
+ *  All routes under /category
+ */
+const logger = require('../../winstonLogger')(module);
+const express = require('express');
+const router = express.Router();
+
 const handler = require('../../handlers/web/categoriesWebHandler.js');
 const security = require('../../utils/security.js');
 
-const CategoryRoutes = function () {
-};
+/**
+ * List categories
+ */
+router.get('/list', security.isAuthenticatedAdmin, handler.listCategories);
 
-CategoryRoutes.createRoutes = function (self) {
+/**
+ * Add new category page
+ */
+router.get('/add', security.isAuthenticatedAdmin, handler.addCategory);
 
-    /**
-     * List categories
-     */
-    self.app.get('/categories', security.isAuthenticatedAdmin, handler.listCategories);
-
-    /**
-     * Add new category page
-     */
-    self.app.get('/category/add', security.isAuthenticatedAdmin, handler.addCategory);
-
-    /**
-     * Get all technologies for for category
-     */
-    self.app.get('/category/:category/technologies', security.isAuthenticated, handler.technologiesForCategory);
-};
+/**
+ * Get all technologies for for category
+ */
+router.get('/:category/technologies', security.isAuthenticated, handler.technologiesForCategory);
 
 
-module.exports = CategoryRoutes;
+module.exports = router;
