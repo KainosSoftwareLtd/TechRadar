@@ -6,6 +6,7 @@
   },
   "env": {
   },
+  "stack": "heroku-18",
   "formation": {
     "web": {
       "quantity": 1
