@@ -5,7 +5,7 @@ var expect = chai.expect;
 
 var tagsDao = require('../../../dao/tag.js');
 var apiTags = require('../../../handlers/api/tagsApiHandler.js');
-var apiutils = require('../../../handlers/api/apiUtils.js');
+var apiutils = require('../../../utils/apiUtils.js');
 var tagValidator = require('../../../shared/validators/tagValidator.js');
 
 describe("Tags api handler", function() {

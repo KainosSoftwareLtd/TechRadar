@@ -1,27 +1,20 @@
+'use strict';
+/**
+ *  All routes under /comments
+ */
+const express = require('express');
+const router = express.Router();
+
 const handler = require('../../handlers/web/commentsWebHandler');
 const security = require('../../utils/security');
 
-const CommentRoutes = function () {
-};
+// Add a new comment for technology
+router.get('/add/:id', security.canAddComments, handler.add);
 
-CommentRoutes.createRoutes = function (self) {
+// Update a comment for technology
+router.get('/update/:commentId', security.canAddComments, handler.update);
 
-    /**
-     * Add a new comment for technology
-     */
-    self.app.get('/comments/add/:id', security.canAddComments, handler.add);
+//Get Comments for a technology
+router.get('/:technologyId/:page', security.isAuthenticated, handler.commentsForTechnology);
 
-    /**
-     * Update a comment for technology
-     */
-    self.app.get('/comments/update/:commentId', security.canAddComments, handler.update);
-
-    /**
-     * Get Comments for a technology
-     */
-    self.app.get('/comments/:technologyId/:page', security.isAuthenticated, handler.commentsForTechnology);
-
-};
-
-
-module.exports = CommentRoutes;
+module.exports = router;

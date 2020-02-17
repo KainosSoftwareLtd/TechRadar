@@ -43,7 +43,7 @@
         <div class="col-md-10 col-md-offset-1">
             <div id="custom-toolbar">
                 <div class="form-inline" role="form">
-                    <a href="/user/add"  class="btn btn-success">
+                    <a href="/users/add"  class="btn btn-success">
                         <i class="glyphicon glyphicon-plus"></i>
                         Add
                     </a>
@@ -169,7 +169,7 @@
 
     function operateFormatter(value, row, index) {
         return [
-            '<a href="/user/' + row['id'] + '/edit">' + value + '</a>'
+            '<a href="/users/' + row['id'] + '/edit">' + value + '</a>'
         ].join('');
     }
 </script>

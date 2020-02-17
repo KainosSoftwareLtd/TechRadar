@@ -1,5 +1,6 @@
-const pg = require('pg');
-const dbhelper = require('../utils/dbhelper.js');
+'use strict';
+
+const database = require('../utils/dbConnection.js');
 
 /**
  * Database routines for 'Role's'
@@ -9,10 +10,9 @@ const Role = function () {
 
 /**
  * Get all the Roles
- * @param done function to call with the results
  */
-Role.getAll = function(done) {
-    dbhelper.getAllFromTable("roles", done, "name"  );
+Role.getAll = function() {
+    return database.getAllFromTable( "roles", "name"  );
 };
 
 module.exports = Role;

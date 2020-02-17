@@ -20,11 +20,11 @@
 
 <div tabindex="-1" id="content" class="site-header" style="margin-bottom: 10px">
     <div class="container">
-        <row>
+        <div>
             <div class="col-md-12">
-                <h1>Project Search For Tag: <%= tag.name %></h1>
+                <h1>Tag: <%= tag.name %></h1>
             </div>
-        </row>
+        </div>
 
     </div>
 </div>
@@ -33,7 +33,7 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/projects">Project search</a></li>
+            <li><a href="/projects/list">Project search</a></li>
             <li class="active">Tag: <%= tag.name %></li>
         </ol>
     </div>
@@ -46,7 +46,7 @@
 
             <div id="custom-toolbar">
                 <div class="form-inline" role="form">
-                    <a href="/project/add" class="btn btn-success">
+                    <a href="/projects/add" class="btn btn-success">
                         <i class="glyphicon glyphicon-plus"></i>
                         Add
                     </a>
@@ -166,7 +166,7 @@ $(function () { // when the DOM is ready
     $editBtn.click(function () {
         var data = {};
         data.id = getIdSelections();
-        location.href = '/project/' + data.id[0] + '/edit';
+        location.href = '/projects/' + data.id[0] + '/edit';
     });
 
     <% } %>
@@ -179,7 +179,7 @@ $(function () { // when the DOM is ready
 
     function operateFormatter(value, row, index) {
         return [
-            '<a href="/project/' + row['id'] + '">' + value + '</a>'
+            '<a href="/projects/' + row['id'] + '">' + value + '</a>'
         ].join('');
     }
 });

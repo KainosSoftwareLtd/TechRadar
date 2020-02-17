@@ -31,7 +31,7 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/projects">Projects</a></li>
+            <li><a href="/projects/list">Projects</a></li>
             <li class="active">Tags</li>
         </ol>
     </div>
@@ -155,7 +155,7 @@
 
     function tagNameFormatter(value, row, index) {
         return [
-            '<a href="/projects/tag/' + row['id'] + '">' + value + '</a>'
+            '<a href="/projects/tags/' + row['id'] + '">' + value + '</a>'
         ];
     }
 

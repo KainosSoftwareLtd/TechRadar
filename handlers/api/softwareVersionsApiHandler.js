@@ -1,5 +1,7 @@
+'use strict';
+
 const sanitizer = require('sanitize-html');
-const apiutils = require('./apiUtils.js');
+const apiutils = require('../../utils/apiUtils.js');
 const versionsDao = require('../../dao/softwareVersions.js');
 const {check, validationResult} = require('express-validator');
 
@@ -11,19 +13,18 @@ const SoftwareVersionsApiHandler = function () {
  */
 SoftwareVersionsApiHandler.getAllVersionsForTechnology = function (req, res) {
     const techId = sanitizer(req.params.technology);
-    versionsDao.getAllForTechnology(techId, function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    versionsDao.getAllForTechnology(techId)
+        .then(result => apiutils.sendResultAsJson(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 SoftwareVersionsApiHandler.addVersion = function (req, res) {
     const techId = sanitizer(req.body.technology);
     const name = sanitizer(req.body.name.trim());
 
-    versionsDao.add(techId, name, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    })
+    versionsDao.add(techId, name)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 SoftwareVersionsApiHandler.updateVersion = function (req, res) {
@@ -35,21 +36,21 @@ SoftwareVersionsApiHandler.updateVersion = function (req, res) {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.end(JSON.stringify({success: false, error: errors}));
+        apiutils.handleResultSet(res, errors);
         return;
     }
 
-    versionsDao.update(versionId, name, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    })
+    versionsDao.update(versionId, name)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 SoftwareVersionsApiHandler.deleteVersions = function (req, res) {
     const versions = req.body.versions;
 
-    versionsDao.delete(versions, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    })
+    versionsDao.delete(versions)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 module.exports = SoftwareVersionsApiHandler;

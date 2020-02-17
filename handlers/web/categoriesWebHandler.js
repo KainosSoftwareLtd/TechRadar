@@ -19,32 +19,31 @@ CategoriesWebHandler.addCategory = function (req, res) {
 CategoriesWebHandler.technologiesForCategory = function (req, res) {
 
     const cname = decodeURI(req.params.category);
-    technology.getAllForCategory(cname.toLowerCase(), function (values) {
+    technology.getAllForCategory(cname.toLowerCase())
+        .then(values => {
 
-        if (values == null) {
-            res.redirect('/error');
-            return;
-        }
+            // groups technologies by status into the following structure:
+            // [{ status: key, technologies: [technologies where status==key]}]
+            const technologiesInGroups = _.chain(values).groupBy('status')
+                .map(function (technologies, key) {
+                    return {
+                        status: key,
+                        technologies: technologies
+                    };
+                }).value();
 
-        // groups technologies by status into the following structure: 
-        // [{ status: key, technologies: [technologies where status==key]}]
-        const technologiesInGroups = _.chain(values).groupBy('status')
-            .map(function(technologies, key) {
-                return {
-                    status: key,
-                    technologies: technologies
-                };
-            }).value();
+            const category = cache.getCategory(cname);
 
-        const category = cache.getCategory(cname);
-
-        res.render('pages/categoryRadar', {
-            category: category,
-            technologies: values, // used by radar.js
-            technologiesInGroups: technologiesInGroups,
-            user: req.user
+            res.render('pages/categoryRadar', {
+                category: category,
+                technologies: values, // used by radar.js
+                technologiesInGroups: technologiesInGroups,
+                user: req.user
+            });
+        })
+        .catch(error => {
+            res.redirect('/error')
         });
-    });
 };
 
 module.exports = CategoriesWebHandler;

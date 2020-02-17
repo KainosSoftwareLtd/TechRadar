@@ -4,7 +4,7 @@ var expect = chai.expect;
 
 var cache = require('../../../dao/cache.js');
 var category = require('../../../dao/category.js');
-var apiutils = require('../../../handlers/api/apiUtils.js');
+var apiutils = require('../../../utils/apiUtils.js');
 
 var apiCategories = require('../../../handlers/api/categoriesApiHandler.js');
 

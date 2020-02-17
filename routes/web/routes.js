@@ -11,7 +11,7 @@ const passport = require('passport');
 const security = require('../../utils/security');
 const {check, validationResult} = require('express-validator');
 
-
+// Index page
 router.get('/', security.isAuthenticated,
     function (req, res) {
         const url = req.session.redirect_to;
@@ -23,9 +23,7 @@ router.get('/', security.isAuthenticated,
         }
     });
 
-/**
- * Error page
- */
+// Error page
 router.get('/error',
     function (req, res) {
         if (req.isAuthenticated()) {
@@ -35,9 +33,7 @@ router.get('/error',
         }
     });
 
-/**
- * Login page
- */
+// Login page
 router.get('/login', function (req, res) {
     if (req.isAuthenticated()) {
         res.redirect('/');
@@ -47,9 +43,7 @@ router.get('/login', function (req, res) {
     }
 });
 
-/**
- * Sign up page
- */
+// Sign up page
 router.get('/signup', function (req, res) {
     if (req.isAuthenticated()) {
         res.redirect('/');
@@ -58,10 +52,12 @@ router.get('/signup', function (req, res) {
     }
 });
 
+// MI dashboard
 router.get('/dashboard', security.isAuthenticated, function (req, res) {
     res.render('pages/dashboards/dashboard', {user: req.user});
 });
 
+// Not yet used
 router.get('/mindmap/project/:project', security.isAuthenticated, function (req, res) {
     check('project', 'Invalid project name').isAlpha();
 
@@ -73,25 +69,25 @@ router.get('/mindmap/project/:project', security.isAuthenticated, function (req,
     }
 
     const pid = req.params.project;
-    technology.getAllForProject(pid, function (error, result) {
-        if (error) {
+    technology.getAllForProject(pid)
+        .then( result=> {
+            res.render('pages/dashboards/mindmap', {user: req.user, data: result})
+        })
+        .catch(error=> {
             logger.error("Error : ", errors);
             res.redirect('/error');
-        } else {
-            res.render('pages/dashboards/mindmap', {user: req.user, data: result});
-        }
-    });
+        })
 });
 
-/**
- * POST login credentials
- */
+// POST for login credentials
 router.post('/login', passport.authenticate('local', {
     successRedirect: '/',
     failureRedirect: '/login',
     failureFlash: true
 }));
 
+
+// Azure AD Login
 router.get('/loginAzureAD',
     passport.authenticate('azuread-openidconnect', {failureRedirect: '/'}),
     function (req, res) {
@@ -99,7 +95,7 @@ router.get('/loginAzureAD',
     }
 );
 
-/* Accept login request */
+// Azure AD return URL
 router.post('/auth/openid/return',
     passport.authenticate('azuread-openidconnect', {failureRedirect: '/'}),
     function (req, res) {
@@ -107,7 +103,7 @@ router.post('/auth/openid/return',
     }
 );
 
-/* Logout */
+// Logout
 router.get('/logout', function (req, res) {
     req.session.destroy(function (err) {
         req.logOut();

@@ -1,28 +1,23 @@
-const users = require('../../dao/users');
-const technology = require('../../dao/technology');
-const comments = require('../../dao/comments');
+'use strict';
+/**
+ *  All routes under /stacks
+ */
+const express = require('express');
+const router = express.Router();
+
 const bodyParser = require('body-parser');
-const jsonParser = bodyParser.json();
-const passport = require('passport');
 const security = require('../../utils/security');
 
-const StackRoutes = function () {
-};
+/**
+ * Stack builder - WIP
+ */
+router.get('/list', security.isAuthenticated, function (req, res) {
+    res.render('pages/listStacks', {user: req.user});
+});
+
+router.get('/add', security.isAuthenticated, function (req, res) {
+    res.render('pages/addStack', {user: req.user});
+});
 
 
-StackRoutes.createRoutes = function (self) {
-
-    /**
-     * Stack builder
-     */
-    self.app.get('/stacks', security.isAuthenticated, function (req, res) {
-        res.render('pages/listStacks', {user: req.user});
-    });
-
-    self.app.get('/stack/add', security.isAuthenticated, function (req, res) {
-        res.render('pages/addStack', {user: req.user});
-    });
-
-};
-
-module.exports = StackRoutes;
+module.exports = router;

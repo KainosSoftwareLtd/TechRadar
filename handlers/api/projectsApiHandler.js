@@ -1,6 +1,8 @@
+'use strict';
+
 const projects = require('../../dao/projects');
 const technology = require('../../dao/technology');
-const apiutils = require('./apiUtils.js');
+const apiutils = require('../../utils/apiUtils.js');
 const sanitizer = require('sanitize-html');
 const projectValidator = require('../../shared/validators/projectValidator.js');
 const {check, validationResult} = require('express-validator');
@@ -11,18 +13,17 @@ const ProjectsApiHandler = function () {
 
 ProjectsApiHandler.getProjects = function (req, res) {
 
-    projects.getAll(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    projects.getAll()
+        .then(result => apiutils.sendResultAsJson(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 ProjectsApiHandler.getProjectsForTag = function (req, res) {
     const tagId = sanitizer(req.params.tagId);
 
-    projects.getAllForTag(tagId, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    projects.getAllForTag(tagId)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 ProjectsApiHandler.addProject = function (req, res) {
@@ -32,67 +33,57 @@ ProjectsApiHandler.addProject = function (req, res) {
 
     const validationResult = projectValidator.validateProjectName(projectName);
     if (!validationResult.valid) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        const data = {};
-        data.error = validationResult.message;
-        data.success = false;
-        res.end(JSON.stringify(data));
+        apiutils.sendErrorResponse(res, validationResult.message);
         return;
     }
 
-    projects.add(
-        projectName,
-        projectDescription,
-
-        function (result, error) {
-            apiutils.handleResultSet(res, result, error);
-        });
-
+    projects.add(projectName, projectDescription)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 
 ProjectsApiHandler.deleteProject = function (req, res) {
     const data = req.body.id;
 
-    projects.delete(data, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    })
+    projects.delete(data)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
+
 };
 
-ProjectsApiHandler.deleteTechnologiesFromProject = function (req, res) {
+ProjectsApiHandler.removeTechnologiesFromProject = function (req, res) {
     const linkIds = req.body.links;
 
-    projects.deleteTechnologies(linkIds, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    projects.removeTechnologiesFromProject(linkIds)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 ProjectsApiHandler.updateTechnologyVersion = function (req, res) {
     const versionId = sanitizer(req.body.version);
     const linkId = sanitizer(req.params.linkId);
-    
+
     check('linkId', 'Invalid technology-project link ID').isInt();
     check('version', 'Invalid version ID').isInt();
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
-        res.end(JSON.stringify({success: false, error: errors}));
+        apiutils.sendErrorResponse(res, errors);
         return;
     }
 
-    projects.updateTechnologyVersion(versionId, linkId, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    projects.updateTechnologyVersion(versionId, linkId)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 ProjectsApiHandler.getTechnologiesForProject = function (req, res) {
     const projectId = sanitizer(req.params.projectId);
 
-    technology.getAllForProject(projectId, function (error, result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    technology.getAllForProject(projectId)
+        .then(result => apiutils.sendResultAsJson(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 
@@ -101,9 +92,9 @@ ProjectsApiHandler.addTechnologyToProject = function (req, res) {
     const technologyIds = req.body.technologies;
     const versionIds = req.body.versions;
 
-    projects.addTechnologies(projectId, technologyIds, versionIds, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    projects.addTechnologies(projectId, technologyIds, versionIds)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 
@@ -111,10 +102,9 @@ ProjectsApiHandler.updateProject = function (req, res) {
     projects.update(
         req.body.projectId,
         sanitizer(req.body.projectname.trim()),
-        sanitizer(req.body.description), function (result, error) {
-            apiutils.handleResultSet(res, result, error);
-        });
-
+        sanitizer(req.body.description))
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 module.exports = ProjectsApiHandler;

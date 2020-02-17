@@ -27,7 +27,7 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/projects">Manage projects</a></li>
+            <li><a href="/projects/list">Manage projects</a></li>
             <li class="active">Edit Project</li>
         </ol>
     </div>
@@ -81,7 +81,7 @@
             success: function (result) {
 
                 if (result.success) {
-                    location.href = "/projects";
+                    location.href = "/projects/list";
                 } else {
                     alert("There was an error editing the project");
                 }

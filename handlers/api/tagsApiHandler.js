@@ -1,29 +1,33 @@
+'use strict';
+
 const tag = require('../../dao/tag.js');
 const sanitizer = require('sanitize-html');
-const apiutils = require('./apiUtils.js');
+const apiutils = require('../../utils/apiUtils.js');
 const tagValidator = require('../../shared/validators/tagValidator.js');
 
 const TagsApiHandler = function () {
 };
 
 TagsApiHandler.getTags = function (req, res) {
-    tag.getAll(function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    tag.getAll()
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
+
 };
 
 TagsApiHandler.getAllWithOptionalProjectId = function (req, res) {
     const projectId = sanitizer(req.params.projectId);
-    tag.getAllWithOptionalProjectId(projectId, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    tag.getAllWithOptionalProjectId(projectId)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
+
 };
 
 TagsApiHandler.getForProject = function (req, res) {
     const projectId = sanitizer(req.params.projectId);
-    tag.getAllForProject(projectId, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    tag.getAllForProject(projectId)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 TagsApiHandler.addTag = function (req, res) {
@@ -39,28 +43,34 @@ TagsApiHandler.addTag = function (req, res) {
         return;
     }
 
-    tag.add(
-        tagName,
-        function (result, error) {
-            apiutils.handleResultSet(res, result, error);
-    });
+    tag.add(tagName)
+        .then(result => apiutils.handleResultSet(res, result))
+        .catch(error => apiutils.sendErrorResponse(res, error));
 };
 
 TagsApiHandler.deleteTags = function (req, res) {
     const tagIds = req.body.tags;
 
-    tag.delete(tagIds, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    tag.delete(tagIds)
+        .then(result => {
+            apiutils.handleResultSet(res, result, null);
+        })
+        .catch(error => {
+            apiutils.sendErrorResponse(res, error);
+        });
 };
 
 TagsApiHandler.reassignTagsToProject = function (req, res) {
     const tagIds = req.body.tags;
     const projectId = sanitizer(req.params.projectId);
 
-    tag.reassignToProject(projectId, tagIds, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    tag.reassignToProject(projectId, tagIds)
+        .then(result => {
+            apiutils.handleResultSet(res, result, null);
+        })
+        .catch(error => {
+            apiutils.sendErrorResponse(res, error);
+        });
 };
 
 TagsApiHandler.updateTag = function (req, res) {
@@ -77,9 +87,13 @@ TagsApiHandler.updateTag = function (req, res) {
         return;
     }
 
-    tag.update(tagId, tagName, function (result, error) {
-        apiutils.handleResultSet(res, result, error);
-    });
+    tag.update(tagId, tagName)
+        .then(result => {
+            apiutils.handleResultSet(res, result, null);
+        })
+        .catch(error => {
+            apiutils.sendErrorResponse(res, error);
+        });
 };
 
 module.exports = TagsApiHandler;

@@ -22,7 +22,8 @@
     <div class="container">
         <row>
             <div class="col-md-12">
-                <h1>Project Search</h1>
+                <h1>Projects</h1>
+                <p>Search projects</p>
             </div>
         </row>
 
@@ -45,7 +46,7 @@
 
             <div id="custom-toolbar">
                 <div class="form-inline" role="form">
-                    <a href="/project/add" class="btn btn-success">
+                    <a href="/projects/add" class="btn btn-success">
                         <i class="glyphicon glyphicon-plus"></i>
                         Add
                     </a>
@@ -161,7 +162,7 @@ $(function () { // when the DOM is ready
     $editBtn.click(function () {
         var data = {};
         data.id = getIdSelections();
-        location.href = '/project/' + data.id[0] + '/edit';
+        location.href = '/projects/' + data.id[0] + '/edit';
     });
 
     <% } %>
@@ -174,7 +175,7 @@ $(function () { // when the DOM is ready
 
     function operateFormatter(value, row, index) {
         return [
-            '<a href="/project/' + row['id'] + '">' + value + '</a>'
+            '<a href="/projects/' + row['id'] + '">' + value + '</a>'
         ].join('');
     }
 });

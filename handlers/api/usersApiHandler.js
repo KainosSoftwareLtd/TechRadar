@@ -1,6 +1,6 @@
 const users = require('../../dao/users.js');
 const User = require('../../models/User');
-const apiutils = require('./apiUtils.js');
+const apiutils = require('../../utils/apiUtils.js');
 
 const sanitizer = require('sanitize-html');
 const crypto = require('crypto');
@@ -28,11 +28,7 @@ UsersApiHandler.addUser = function (req, res) {
     }
 
     if(!validationResult.valid) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        const data = {};
-        data.error = validationResult.message;
-        data.success = false;
-        res.end(JSON.stringify(data));
+        apiutils.sendErrorResponse(res, validationResult.message);
         return;
     }
 
@@ -69,7 +65,7 @@ UsersApiHandler.updateProfile = function (req, res) {
         validationResult = userValidator.validateAvatar(req.file);
     }
     if(!validationResult.valid) {
-        apiutils.handleResultSet(res, null, validationResult.message);
+        apiutils.sendErrorResponse(res, validationResult.message);
         return;
     }
 
@@ -118,7 +114,7 @@ UsersApiHandler.updateUser = function (req, res) {
         validationResult = userValidator.validateAvatar(req.file);
     }
     if(!validationResult.valid) {
-        apiutils.handleResultSet(res, null, validationResult.message);
+        apiutils.sendErrorResponse(res, validationResult.message);
         return;
     }
 

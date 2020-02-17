@@ -25,7 +25,7 @@ $(function() {
      * @param tag Contains id and name of a tag
      */
     TechRadar.convertTagToHtml = function(tag) {
-        return '<a href="/projects/tag/' + 
+        return '<a href="/projects/tags/' +
             tag.id + '"><span class="tag label label-info">' + 
             tag.name + '</span></a> ';
     };

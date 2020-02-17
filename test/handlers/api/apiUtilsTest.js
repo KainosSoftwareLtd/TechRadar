@@ -6,7 +6,7 @@ var cache = require('../../../dao/cache.js');
 var category = require('../../../dao/category.js');
 var technology = require('../../../dao/technology.js');
 
-var apiUtils = require('../../../handlers/api/apiUtils.js');
+var apiUtils = require('../../../utils/apiUtils.js');
 
 
 describe("apiUtils", function() {

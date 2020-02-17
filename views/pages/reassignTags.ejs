@@ -28,7 +28,7 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/project/<%= project.id %>"><%= project.name %></a></li>
+            <li><a href="/projects/<%= project.id %>"><%= project.name %></a></li>
             <li class="active">Tags</li>
         </ol>
     </div>
@@ -111,7 +111,7 @@
 
     function tagNameFormatter(value, row, index) {
         return [
-            '<a href="/projects/tag/' + row['id'] + '">' + value + '</a>'
+            '<a href="/projects/tags/' + row['id'] + '">' + value + '</a>'
         ];
     }
 
@@ -133,7 +133,7 @@
             data: JSON.stringify(data)
         }).done(function( msg ) {
             if(msg.success) {
-                location.href = "/project/<%= project.id %>/tags";
+                location.href = "/projects/<%= project.id %>/tags";
             } else {
                 alert("Unable to attach tags. \n" + msg.error);
             }

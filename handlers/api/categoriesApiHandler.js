@@ -1,7 +1,9 @@
+'use strict';
+
 const cache = require('../../dao/cache.js');
 const category = require('../../dao/category.js');
 const sanitizer = require('sanitize-html');
-const apiutils = require('./apiUtils.js');
+const apiutils = require('../../utils/apiUtils.js');
 
 const CategoriesApiHandler = function () {
 };
@@ -10,36 +12,32 @@ const CategoriesApiHandler = function () {
  * Get all categories
  */
 CategoriesApiHandler.getCategories = function (req, res) {
-    category.getAll(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    category.getAll()
+        .then(result => apiutils.sendResultAsJson(res,result))
+        .catch(error => apiutils.sendErrorResponse(res,error));
 };
 
 CategoriesApiHandler.addCategory = function (app) {
     return function (req, res) {
-        category.add(
-            sanitizer( req.body.name.trim() ),
-            sanitizer( req.body.description ),
-            function (result , error ) {
-                if(result) {
-                    cache.refresh(app);
-                }
-                apiutils.handleResultSet( res, result , error );
-            });
+        category.add(sanitizer(req.body.name.trim()), sanitizer(req.body.description))
+            .then(result => {
+                cache.refresh(app);
+                apiutils.handleResultSet(res, result, null);
+            })
+            .catch(error => apiutils.handleResultSet(res, null, error));
     }
 };
 
 CategoriesApiHandler.deleteCategories = function (app) {
     return function (req, res) {
-        const data = req.body.id ;
+        const data = req.body.id;
 
-        category.delete( data , function( result , error ) {
-            if(result) {
+        category.delete(data)
+            .then(result => {
                 cache.refresh(app);
-            }
-            apiutils.handleResultSet( res, result , error );
-        });
+                apiutils.handleResultSet(res, result, null);
+            })
+            .catch(error => apiutils.handleResultSet(res, null, error));
     }
 };
 

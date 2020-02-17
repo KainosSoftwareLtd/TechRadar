@@ -1,3 +1,5 @@
+'use strict';
+const logger = require('../../winstonLogger')(module);
 const comments = require('../../dao/comments');
 const technology = require('../../dao/technology');
 const {check, validationResult} = require('express-validator');
@@ -12,15 +14,21 @@ CommentsWebHandler.add = function (req, res) {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        logger.error(errors);
         res.redirect('/error');
         return;
     }
 
     const num = req.params.id;
-    technology.getById(req.user.id, num, function (value) {
-        res.render('pages/addComment', {technology: value, user: req.user});
-    });
+    technology.getById(req.user.id, num)
+        .then(technology => {
+            res.render('pages/addComment', {technology: technology, user: req.user});
+        })
+        .catch(error => {
+            logger.error(error);
+            res.redirect('/error')
+        })
+
 };
 
 CommentsWebHandler.update = function (req, res) {
@@ -28,14 +36,23 @@ CommentsWebHandler.update = function (req, res) {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        logger.error(errors);
         res.redirect('/error');
     } else {
-        comments.getById(req.params.commentId, function (comment) {
-            technology.getById(req.user.id, comment.technology, function (technology) {
+        let theComment;
+
+        comments.getById(req.params.commentId)
+            .then(comment => {
+                theComment = comment;
+                return technology.getById(req.user.id, comment.technology);
+            })
+            .then(technology => {
                 res.render('pages/updateComment', {technology: technology, user: req.user, comment: comment});
-            });
-        });
+            })
+            .catch(error => {
+                logger.error(error);
+                res.redirect('/error');
+            })
     }
 };
 
@@ -45,25 +62,33 @@ CommentsWebHandler.commentsForTechnology = function (req, res) {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        logger.error(errors);
         res.redirect('/error');
         return;
     }
 
-    const techid = req.params.technologyId;
+    const techId = req.params.technologyId;
     const pageNumber = req.params.page;
-    comments.getForTechnology(techid, pageNumber, PAGE_SIZE, function (result, error) {
-        comments.getCountForTechnology(techid, function (countData) {
+    let returnedComments;
+    comments.getForTechnology(techId, pageNumber, PAGE_SIZE)
+        .then(result => {
+            returnedComments = result;
+            return comments.getCountForTechnology(techId);
+        })
+        .then(countData => {
             res.render('partials/comments', {
-                comments: result,
+                comments: returnedComments,
                 user: req.user,
                 count: countData.count,
                 pageSize: PAGE_SIZE,
                 currentPage: pageNumber,
-                technologyId: techid
+                technologyId: techId
             });
+        })
+        .catch(error => {
+            logger.error(error);
+            res.sendStatus(500);
         });
-    });
 };
 
 module.exports = CommentsWebHandler;

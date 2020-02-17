@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const jsonParser = bodyParser.json();
 const security = require('../../utils/security.js');
 const sanitizer = require('sanitize-html');
-const apiutils = require('./apiUtils.js');
+const apiutils = require('../../utils/apiUtils.js');
 
 const ApiStackRoutes = function () {
 };

@@ -32,7 +32,7 @@ ApiProjectRoutes.createRoutes = function (self) {
      * Delete a set of technologies from a project
      */
     self.app.delete('/api/project/:projectId/technology', security.canEdit, jsonParser, 
-        handler.deleteTechnologiesFromProject);
+        handler.removeTechnologiesFromProject);
 
     /**
      * Update software version in a technology - project link

@@ -2,7 +2,7 @@
  * Cache module
  *
  * This keeps frequently used values loaded in memory to reduce database calls.
- * 
+ *
  * Currently:
  *  Statuses
  *  Categories
@@ -23,58 +23,64 @@ const Cache = function () {
 };
 
 
-Cache.refresh = function ( app ) {
-    categoryDao.getAll( function (results ) {
-        categories = results;
-        app.locals.categories = results;
-    });
-    
-    statusDao.getAll( function (results ) {
-        statuses = results;
-        app.locals.statuses = results;
-    });
+Cache.refresh = function (app) {
+    categoryDao.getAll()
+        .then(results => {
+            categories = results;
+            app.locals.categories = results;
+        });
 
-    roleDao.getAll( function (results ) {
-        roles = results;
-        app.locals.roles = results;
-    });
+    statusDao.getAll()
+        .then(results => {
+            statuses = results;
+            app.locals.statuses = results;
+        });
 
-    usedThisTechnologyDao.getAllOptions( function (results ) {
-        usedThisTechOptions = results;
-        app.locals.usedThisTechOptions = results;
-    });
+    roleDao.getAll()
+        .then(results => {
+            roles = results;
+            app.locals.roles = results;
+        });
+
+
+    usedThisTechnologyDao.getAllOptions()
+        .then(results => {
+            usedThisTechOptions = results;
+            app.locals.usedThisTechOptions = results;
+        });
+
 };
 
-Cache.getCategories = function() {
+Cache.getCategories = function () {
     return categories;
 };
 
-Cache.getCategory = function( value ) {
- 
-    for(let i=0;i<categories.length;i++) {
+Cache.getCategory = function (value) {
+
+    for (let i = 0; i < categories.length; i++) {
         let category = categories[i];
-        if( category.name.toLowerCase() === value.toLowerCase()) {
+        if (category.name.toLowerCase() === value.toLowerCase()) {
             return category;
         }
     }
     return null;
 };
 
-Cache.getStatuses= function() {
+Cache.getStatuses = function () {
     return statuses;
 };
 
-Cache.getStatus= function( value ) {
-    for(let i=0;i<statuses.length;i++) {
+Cache.getStatus = function (value) {
+    for (let i = 0; i < statuses.length; i++) {
         let status = statuses[i];
-        if( status.name.toLowerCase() === value.toLowerCase()) {
+        if (status.name.toLowerCase() === value.toLowerCase()) {
             return status;
         }
     }
     return null;
 };
 
-Cache.getUsedThisTechOptions = function() {
+Cache.getUsedThisTechOptions = function () {
     return usedThisTechOptions;
 };
 

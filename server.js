@@ -175,16 +175,16 @@ const TechRadar = function () {
         // update the cache of static information from the DB
         cache.refresh(self.app);
 
-        // Create all the routes and refresh the cache
+        // Define the web routes
         self.app.use('/', routes);
         self.app.use('/technology', technologyRoutes);
-        self.app.use( '/category', categoryRoutes);
+        self.app.use('/category', categoryRoutes);
+        self.app.use('/comments', commentRoutes);
+        self.app.use('/projects', projectRoutes);
+        self.app.use('/stacks', stackRoutes);
+        self.app.use('/users',userRoutes);
 
-        stackRoutes.createRoutes(self);
-        projectRoutes.createRoutes(self);
-        userRoutes.createRoutes(self);
-        commentRoutes.createRoutes(self);
-        //
+
         // // API routes
         apiStack.createRoutes(self);
         apiTechnologies.createRoutes(self);

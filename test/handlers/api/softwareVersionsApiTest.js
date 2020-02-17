@@ -3,7 +3,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 var versionsDao = require('../../../dao/softwareVersions.js');
-var apiutils = require('../../../handlers/api/apiUtils.js');
+var apiutils = require('../../../utils/apiUtils.js');
 var apiVersions = require('../../../handlers/api/softwareVersionsApiHandler.js');
 
 describe("Software versions api handler", function() {

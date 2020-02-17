@@ -3,7 +3,7 @@ var chai = require('chai');
 var expect = chai.expect;
 
 var users = require('../../../dao/users.js');
-var apiutils = require('../../../handlers/api/apiUtils.js');
+var apiutils = require('../../../utils/apiUtils.js');
 var userValidator  = require('../../../shared/validators/userValidator.js');
 
 var apiUsers = require('../../../handlers/api/usersApiHandler.js');

@@ -34,7 +34,7 @@
     <div class="col-md-12">
         <ol class="breadcrumb" style="margin-top: 10px;">
             <li><a href="/">Home</a></li>
-            <li><a href="/project/<%=project.id%>"><%=project.name%></a></li>
+            <li><a href="/projects/<%=project.id%>"><%=project.name%></a></li>
             <li class="active">Remove Technology</li>
         </ol>
     </div>
@@ -135,7 +135,7 @@
             data: JSON.stringify(data),
             complete: function(result){
                 if (result.success) {
-                    location.href = "/project/<%=project.id%>";
+                    location.href = "/projects/<%=project.id%>";
                 } else {
                     alert("There was an error adding Technologies");
                 }

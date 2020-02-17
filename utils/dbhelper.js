@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Helper function to perform base database operations (e.g. query, insert)
  */

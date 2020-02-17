@@ -1,80 +1,57 @@
-const pg = require('pg');
-const dbhelper = require('../utils/dbhelper.js');
+'use strict';
+
+const database = require('../utils/dbConnection.js');
 
 const SoftwareVersions = function () {
 };
 
 /**
  * Get all versions that belong to a technology
- * @param done Function to call with the results
  */
-SoftwareVersions.getAllForTechnology = function (technology, done) {
-    const sql = `SELECT sv.id, sv.name, sv.technology, COUNT(tpl.projectid) AS projects_count from software_versions AS sv         
-        LEFT OUTER JOIN technology_project_link tpl ON tpl.software_version_id = sv.id
-        WHERE sv.technology=$1
-        GROUP BY sv.id, sv.name, sv.technology`;
-    const params = [technology];
+SoftwareVersions.getAllForTechnology = function (technology) {
+    const sql = `SELECT sv.id, sv.name, sv.technology, COUNT(tpl.projectid) AS projects_count
+                 from software_versions AS sv
+                          LEFT OUTER JOIN technology_project_link tpl ON tpl.software_version_id = sv.id
+                 WHERE sv.technology = $1
+                 GROUP BY sv.id, sv.name, sv.technology`;
 
-    dbhelper.query(sql, params,
-        function (results) {
-            done(results);
-        },
-        function (error) {
-            console.log(error);
-            done(null);
-        });
+    return database.query(sql, [technology]);
 };
 
 /**
  * Add a new version that's assigned to a single technology
- * @param done Function to call with the results
  */
-SoftwareVersions.add = function (technology, name, done) {
-    const sql = `INSERT INTO software_versions(technology, name) VALUES($1, $2) RETURNING id`;
-    const params = [technology, name];
+SoftwareVersions.add = function (technology, name) {
+    const sql = `INSERT INTO software_versions(technology, name)
+                 VALUES ($1, $2)
+                 RETURNING id`;
 
-    dbhelper.insert(sql, params,
-        function (results) {
-            done(results);
-        },
-        function (error) {
-            console.log(error);
-            done(null);
-        });
+    return database.insertOrUpdate(sql, [technology, name]);
 };
 
 /**
  * Update a version
  * @param version ID of the version to update
  * @param name New name for this version
- * @param done Function to call with the results
  */
-SoftwareVersions.update = function (version, name, done) {
-    const params = [version, name];
-    const sql = `UPDATE software_versions SET name=
-        COALESCE(
-            (SELECT $2::varchar WHERE NOT EXISTS (SELECT 1 FROM software_versions WHERE name = $2)),
-            -- use the original name if the new name is a duplicate
-            name)
-        WHERE id=$1`;
+SoftwareVersions.update = function (version, name) {
+    const sql = `UPDATE software_versions
+                 SET name=
+                         COALESCE(
+                                 (SELECT $2::varchar WHERE NOT EXISTS(SELECT 1 FROM software_versions WHERE name = $2)),
+                             -- use the original name if the new name is a duplicate
+                                 name)
+                 WHERE id = $1`;
 
-    dbhelper.query(sql, params,
-        function (results) {
-            done(results);
-        },
-        function (error) {
-            console.log(error);
-            done(null);
-        });
-}
+    return database.insertOrUpdate( sql, [version,name]);
+};
 
 /**
  * Remove a set of versions using their ID numbers
  * @param versions An array of version IDs
- * @param done
  */
-SoftwareVersions.delete = function (versions, done) {
-    dbhelper.deleteByIds("software_versions" , versions, done );
+SoftwareVersions.delete = function (versions) {
+    return database.deleteByIds("software_versions", versions);
 };
 
 module.exports = SoftwareVersions;

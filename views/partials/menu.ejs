@@ -40,10 +40,10 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false">Projects<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/projects">Search</a></li>
+                        <li><a href="/projects/list">Search</a></li>
                         <% if (user.canEdit) { %>
                         <li role="separator" class="divider"></li>
-                        <li><a href="/project/add">Add Project</a></li>
+                        <li><a href="/projects/add">Add Project</a></li>
                         <li><a href="/projects/tags/edit">Manage Tags</a></li>
                         <% } %>
 
@@ -60,8 +60,8 @@
                        aria-expanded="false">Manage<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/technology/list">Technologies</a></li>
-                        <li><a href="/users">Users</a></li>
-                        <li><a href="/projects">Projects</a></li>
+                        <li><a href="/users/list">Users</a></li>
+                        <li><a href="/projects/list">Projects</a></li>
                         <li><a href="/category/list">Categories</a></li>
                     </ul>
                 </li>
@@ -70,7 +70,7 @@
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                        aria-expanded="false"><%= user.username %><span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="/profile">Edit profile</a></li>
+                        <li><a href="/users/profile">Edit profile</a></li>
                         <li><a href="/logout">Logout</a></li>
                     </ul>
                 </li>

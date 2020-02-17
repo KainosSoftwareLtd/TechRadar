@@ -1,4 +1,7 @@
-const cache = require('../../dao/cache');
+'use strict';
+
+const apiUtils = require('../../utils/apiUtils');
+
 const projects = require('../../dao/projects');
 const votes = require('../../dao/vote');
 const technologies = require('../../dao/technology');
@@ -14,54 +17,46 @@ const DashboardApiHandler = function () {
 DashboardApiHandler.getTechnologyForProject = function (req, res) {
     const projectId = req.params.project;
 
-    projects.getTechForProject(function (projectId, result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    projects.getTechForProject(projectId)
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
 };
 
 DashboardApiHandler.getVotesForAllTechnologies = function (req, res) {
-    votes.getVotesForAllTechnologies(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    })
-}
+    votes.getVotesForAllTechnologies()
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
+};
 
 DashboardApiHandler.getVotesDifferentFromStatus = function (req, res) {
-    votes.getVotesInLastMonthDifferentFromStatus(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    votes.getVotesInLastMonthDifferentFromStatus()
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
 };
 
-DashboardApiHandler.getMostUsedTechnologies = function (req,res) {
-    technologies.getMostUsedTechnologies(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+DashboardApiHandler.getMostUsedTechnologies = function (req, res) {
+    technologies.getMostUsedTechnologies()
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
 };
 
-DashboardApiHandler.getVotesPerUserCount = function (req,res) {
-    votes.getVotesPerUserCount(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+DashboardApiHandler.getVotesPerUserCount = function (req, res) {
+    votes.getVotesPerUserCount()
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
 };
 
-DashboardApiHandler.getCommentsPerTechnology = function (req,res) {
-    comments.getTotalNumberCommentsForTechnologies(function (result) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+DashboardApiHandler.getCommentsPerTechnology = function (req, res) {
+    comments.getTotalNumberCommentsForTechnologies()
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
 };
 
 DashboardApiHandler.getTechnologiesWithUsersCount = function (req, res) {
     const limit = sanitizer(req.query.limit);
-    technologies.getTechnologiesWithUserCounts(limit, function (result, error) {
-        res.writeHead(200, {"Content-Type": "application/json"});
-        res.end(JSON.stringify(result));
-    });
+    technologies.getTechnologiesWithUserCounts(limit)
+        .then(result => apiUtils.sendResultAsJson(res, result))
+        .catch(error => apiUtils.sendErrorResponse(res, error));
 };
-
 
 module.exports = DashboardApiHandler;
