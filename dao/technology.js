@@ -217,17 +217,17 @@ Technology.getAllForCategory = function (cname) {
  */
 Technology.getAllForProject = function (id) {
     // 'num' field has the same value for technologies with the same id
-    const sql = "SELECT dense_rank() over (order by t.id) as num, t.*," +
-        " row_number() over (order by s) AS row_num," +
-        " s.name as status, ver.id AS versionid, ver.name AS version, tpl.id AS linkid" +
-        " FROM technologies t" +
-        " INNER JOIN technology_project_link tpl on t.id=tpl.technologyid" +
-        " LEFT OUTER JOIN software_versions ver on ver.id=tpl.software_version_id" +
-        " INNER JOIN projects p on p.id=tpl.projectid" +
-        " LEFT OUTER JOIN status s on s.id = " +
-        "    COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )" +
-        " WHERE p.id=$1" +
-        " ORDER BY status, t.name ASC;";
+    const sql = `SELECT dense_rank() over (order by t.id) as num, t.*,
+        row_number() over (order by s) AS row_num,
+        s.name as status, ver.id AS versionid, ver.name AS version, tpl.id AS linkid
+        FROM technologies t
+        INNER JOIN technology_project_link tpl on t.id=tpl.technologyid
+        LEFT OUTER JOIN software_versions ver on ver.id=tpl.software_version_id
+        INNER JOIN projects p on p.id=tpl.projectid
+        LEFT OUTER JOIN status s on s.id = 
+           COALESCE( (select statusid from tech_status_link where technologyid=t.id order by date desc limit 1),0 )
+        WHERE p.id=$1
+        ORDER BY status, t.name ASC`;
 
     return database.query(sql, [id]);
 };

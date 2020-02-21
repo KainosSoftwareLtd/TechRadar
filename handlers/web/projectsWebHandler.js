@@ -1,3 +1,6 @@
+'use strict';
+const logger = require('../../winstonLogger')(module);
+
 const projects = require('../../dao/projects');
 const tags = require('../../dao/tag');
 const technology = require('../../dao/technology');
@@ -106,7 +109,7 @@ ProjectsWebHandler.showRadar = function (req, res) {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors);
+        logger.error( "Error showing project radar : ",{message: errors} );
         res.redirect('/error');
         return;
     }
@@ -129,7 +132,7 @@ ProjectsWebHandler.showRadar = function (req, res) {
                 .map(function (technologies, key) {
                     return {
                         status: key,
-                        technologies: theTechnology
+                        technologies: technologies
                     };
                 }).value();
 
