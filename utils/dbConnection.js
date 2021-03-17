@@ -163,15 +163,24 @@ class DBConnection {
             return config;
         } else {
             logger.info("DATABASE_URL found")
-            let params = Url.parse(connectionStr);
-            let auth = params.auth.split(':');
-            let config = {
-                user: auth[ 0 ],
-                password: auth[ 1 ],
-                host: params.hostname,
-                port: params.port,
-                database: params.pathname.split('/')[ 1 ]
-            };
+            logger.info(connectionStr);
+
+            const { parse } = require('pg-connection-string');
+
+            if( process.env.SSLMODE ) {
+                connectionStr += "?sslmode=require";
+            }
+
+            let config = parse(connectionStr)
+            // let params = Url.parse(connectionStr);
+            // let auth = params.auth.split(':');
+            // let config = {
+            //     user: auth[ 0 ],
+            //     password: auth[ 1 ],
+            //     host: params.hostname,
+            //     port: params.port,
+            //     database: params.pathname.split('/')[ 1 ]
+            // };
 
             if( process.env.SSLMODE) {
                 config.ssl = { rejectUnauthorized: false }

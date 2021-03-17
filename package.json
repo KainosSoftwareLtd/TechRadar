@@ -48,6 +48,7 @@
     "passport-local": "latest",
     "pg": "latest",
     "pg-large-object": "latest",
+    "pg-connection-string": "latest",
     "sanitize-html": "latest",
     "sinon": "latest",
     "underscore": "^1.8.3",

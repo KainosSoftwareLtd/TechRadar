@@ -6,3 +6,4 @@ uploads/
 .eslintrc.json
 launch.json
 /tr-error.log
+/process.env
