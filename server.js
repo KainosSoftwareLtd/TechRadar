@@ -3,9 +3,6 @@
  * Tech-radar Application
  */
 
-// Setup the console logging format
-require('console-stamp')(console, '[ddd mmm dd HH:MM:ss]]');
-
 // Load in the environment variables
 require('dotenv').config({path: 'process.env'});
 
