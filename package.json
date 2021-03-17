@@ -20,7 +20,7 @@
     "url": "https://git.heroku.com/techradar-demo.git"
   },
   "engines": {
-    "node": "14.x"
+    "node": "15.x"
   },
   "dependencies": {
     "async": "latest",

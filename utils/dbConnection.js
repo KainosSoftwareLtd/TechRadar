@@ -170,10 +170,14 @@ class DBConnection {
                 password: auth[ 1 ],
                 host: params.hostname,
                 port: params.port,
-                database: params.pathname.split('/')[ 1 ],
-                ssl: !!process.env.SSLMODE
+                database: params.pathname.split('/')[ 1 ]
             };
 
+            if( process.env.SSLMODE) {
+                config.ssl = { rejectUnauthorized: false }
+            }
+
+            logger.info( JSON.stringify( config ));
             return config;
         }
     }
