@@ -167,9 +167,9 @@ class DBConnection {
 
             const { parse } = require('pg-connection-string');
 
-            if( process.env.SSLMODE ) {
-                connectionStr += "?sslmode=require";
-            }
+            // if( process.env.SSLMODE ) {
+            //     connectionStr += "?sslmode=require";
+            // }
 
             let config = parse(connectionStr)
             // let params = Url.parse(connectionStr);
@@ -183,7 +183,7 @@ class DBConnection {
             // };
 
             if( process.env.SSLMODE) {
-                config.ssl = { rejectUnauthorized: false, require: true }
+                config.ssl = true; //{ rejectUnauthorized: false, require: true }
             }
 
             logger.info( JSON.stringify( config ));
