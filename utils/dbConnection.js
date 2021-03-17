@@ -183,7 +183,7 @@ class DBConnection {
             // };
 
             if( process.env.SSLMODE) {
-                config.ssl = { rejectUnauthorized: false }
+                config.ssl = { rejectUnauthorized: false, require: true }
             }
 
             logger.info( JSON.stringify( config ));
