@@ -10,6 +10,8 @@ require('dotenv').config({path:'process.env'});
 const pg = require('pg');
 const async = require('async');
 
+console.log("URI: " + process.env.DATABASE_URL);
+
 const client = new pg.Client(process.env.DATABASE_URL);
 client.connect();
 

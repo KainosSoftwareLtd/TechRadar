@@ -8,11 +8,11 @@
     },
     "local": {
         "driver": "pg",
-        "user": "docker",
-        "password": "docker",
+        "user": "postgres",
+        "password": "password",
         "host": "localhost",
-        "database": "rag",
-        "port": "5435",
+        "database": "postgres",
+        "port": "5432",
         "schema": "public"
     }
 }

@@ -139,9 +139,9 @@ const TechRadar = function () {
         // Setup the secret cookie key
         const cookie_key = process.env.COOKIE_KEY || 'aninsecurecookiekey';
         const sess = {
-            store: new (require('connect-pg-simple')(session))(),
-            resave: false,
-            saveUninitialized: false,
+            store: new (require('connect-pg-simple')(session))(),
+            resave: false,
+            saveUninitialized: false,
             cookie: {},
             secret: cookie_key
         };
@@ -198,7 +198,7 @@ const TechRadar = function () {
     };
 
     /**
-     *  Start the server (starts up the sample application).
+     *  Start the server
      */
     self.start = function () {
         //  Start the app on the specific interface (and port).
