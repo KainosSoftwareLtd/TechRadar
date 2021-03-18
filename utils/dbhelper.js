@@ -1,26 +1,14 @@
 'use strict';
 /**
  * Helper function to perform base database operations (e.g. query, insert)
+ *
+ * @TODO : This module needs to be deprecated and replaced with dbConnection
  */
-const pg = require('pg');
-const url = require('url');
+const database = require('./dbConnection');
 
 const DBHelper = {};
 
-pg.defaults.poolSize = 50;
-
-const params = url.parse(process.env.DATABASE_URL);
-const auth = params.auth.split(':');
-const config = {
-    user: auth[0],
-    password: auth[1],
-    host: params.hostname,
-    port: params.port,
-    database: params.pathname.split('/')[1],
-    ssl: process.env.USE_SSL && process.env.USE_SSL.toLowerCase() !== 'false'
-};
-
-DBHelper.pool = new pg.Pool(config);
+DBHelper.pool = database.getPool();
 
 DBHelper.pool.on('error', function (err, client) {
     console.log(err);

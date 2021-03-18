@@ -13,7 +13,7 @@ require('console-stamp')(console, '[ddd mmm dd HH:MM:ss]]');
 const logger = require('./winstonLogger')(module);
 
 // Express
-const database = require('./utils/dbConnection.js');
+const database = require('./utils/dbConnection');
 const express = require('express');
 const helmet = require('helmet');
 const express_enforces_ssl = require('express-enforces-ssl');
