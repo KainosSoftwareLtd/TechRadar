@@ -15,11 +15,24 @@ class DBConnection {
         const config = DBConnection.getConnectionConfig();
 
         logger.info('creating db pool');
-        this._pool = new pg.Pool(config);
+        try {
+            this._pool = new pg.Pool(config);
+        } catch ( ex) {
+            logger.info("Error creating DB pool");
+        }
 
         this._pool.on('error', function (err, client) {
             logger.error("Database Pool Error : %s", err);
         });
+    }
+
+    /**
+     * Return the DB Pool for other modules to use
+     * This is primarily for the express session to share
+     * @returns {Pool}
+     */
+    getPool() {
+        return this._pool;
     }
 
     /**
@@ -163,30 +176,15 @@ class DBConnection {
             return config;
         } else {
             logger.info("DATABASE_URL found")
-            logger.info(connectionStr);
 
             const { parse } = require('pg-connection-string');
 
-            // if( process.env.SSLMODE ) {
-            //     connectionStr += "?sslmode=require";
-            // }
 
             let config = parse(connectionStr)
-            // let params = Url.parse(connectionStr);
-            // let auth = params.auth.split(':');
-            // let config = {
-            //     user: auth[ 0 ],
-            //     password: auth[ 1 ],
-            //     host: params.hostname,
-            //     port: params.port,
-            //     database: params.pathname.split('/')[ 1 ]
-            // };
-
             if( process.env.SSLMODE) {
-                config.ssl = true; //{ rejectUnauthorized: false, require: true }
+                config.ssl = { require: true, rejectUnauthorized: false };
             }
 
-            logger.info( JSON.stringify( config ));
             return config;
         }
     }

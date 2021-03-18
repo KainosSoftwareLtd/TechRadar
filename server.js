@@ -13,13 +13,15 @@ require('console-stamp')(console, '[ddd mmm dd HH:MM:ss]]');
 const logger = require('./winstonLogger')(module);
 
 // Express
+const database = require('./utils/dbConnection.js');
 const express = require('express');
 const helmet = require('helmet');
 const express_enforces_ssl = require('express-enforces-ssl');
 const helpers = require('express-helpers')();
 const expressValidator = require('express-validator');
 const flash = require('connect-flash');
-const session = require('express-session');
+const expressSession = require('express-session');
+const pgSession = require('connect-pg-simple')(expressSession);
 const bodyParser = require('body-parser');
 
 // Caching to remove some frequent db operations
@@ -139,7 +141,9 @@ const TechRadar = function () {
         // Setup the secret cookie key
         const cookie_key = process.env.COOKIE_KEY || 'aninsecurecookiekey';
         const sess = {
-            store: new (require('connect-pg-simple')(session))(),
+            store: new pgSession({
+                pool: database.getPool()
+            }),
             resave: false,
             saveUninitialized: false,
             cookie: {},
@@ -153,7 +157,7 @@ const TechRadar = function () {
             sess.cookie.secure = true;
         }
  
-        self.app.use(session(sess));
+        self.app.use(expressSession(sess));
 
         // Setup the Google Analytics ID if defined
         self.app.locals.google_id = process.env.GOOGLE_ID || undefined;
