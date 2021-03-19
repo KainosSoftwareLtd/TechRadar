@@ -169,9 +169,12 @@ class DBConnection {
                 password: process.env.PGPASSWORD,
                 host: process.env.PGHOST,
                 port: process.env.PGPORT,
-                database: process.env.PGDATABASE,
-                sslmode: (process.env.SSLMODE?'require':'')
+                database: process.env.PGDATABASE
             };
+
+            if( process.env.SSLMODE != 'false') {
+                config.ssl = { require: true, rejectUnauthorized: false };
+            }
 
             return config;
         } else {
@@ -181,7 +184,7 @@ class DBConnection {
 
 
             let config = parse(connectionStr)
-            if( process.env.SSLMODE) {
+            if( process.env.SSLMODE != 'false') {
                 config.ssl = { require: true, rejectUnauthorized: false };
             }
 

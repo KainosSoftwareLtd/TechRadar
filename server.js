@@ -159,6 +159,17 @@ const TechRadar = function () {
  
         self.app.use(expressSession(sess));
 
+        /**
+         * Apply standard Content Security Policy headers to all responses
+         */
+        self.app.use(function (req, res, next) {
+            res.setHeader(
+                'Content-Security-Policy',
+                "default-src *; img-src 'self' data: http://* https://* ; style-src 'self' http://* https://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'"
+            );
+            next();
+        });
+
         // Setup the Google Analytics ID if defined
         self.app.locals.google_id = process.env.GOOGLE_ID || undefined;
 
